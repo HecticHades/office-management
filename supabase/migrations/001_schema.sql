@@ -1,9 +1,8 @@
--- Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- No extension needed: gen_random_uuid() is built into Postgres 13+
 
 -- Users table (custom auth, NOT Supabase Auth)
 CREATE TABLE users (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   username VARCHAR(50) NOT NULL UNIQUE,
   display_name VARCHAR(100) NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
@@ -19,7 +18,7 @@ CREATE TABLE users (
 
 -- Sessions table
 CREATE TABLE sessions (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   token_hash VARCHAR(255) NOT NULL UNIQUE,
   expires_at TIMESTAMPTZ NOT NULL,
@@ -33,7 +32,7 @@ CREATE INDEX idx_sessions_expires_at ON sessions(expires_at);
 
 -- Temp passwords table
 CREATE TABLE temp_passwords (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   password_hash VARCHAR(255) NOT NULL,
   expires_at TIMESTAMPTZ NOT NULL DEFAULT (NOW() + INTERVAL '24 hours'),
@@ -46,7 +45,7 @@ CREATE INDEX idx_temp_passwords_user_id ON temp_passwords(user_id);
 
 -- Auth audit log
 CREATE TABLE auth_audit_log (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES users(id) ON DELETE SET NULL,
   action VARCHAR(50) NOT NULL,
   details JSONB,
@@ -60,7 +59,7 @@ CREATE INDEX idx_auth_audit_log_created_at ON auth_audit_log(created_at DESC);
 
 -- Teams table
 CREATE TABLE teams (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(100) NOT NULL,
   description TEXT,
   color VARCHAR(7) NOT NULL DEFAULT '#3B82F6',
@@ -70,7 +69,7 @@ CREATE TABLE teams (
 
 -- Team members (join table)
 CREATE TABLE team_members (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   team_id UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   role VARCHAR(20) NOT NULL DEFAULT 'member' CHECK (role IN ('lead', 'member')),
@@ -82,7 +81,7 @@ CREATE INDEX idx_team_members_user_id ON team_members(user_id);
 
 -- Zones (office areas)
 CREATE TABLE zones (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(100) NOT NULL,
   description TEXT,
   floor INTEGER NOT NULL DEFAULT 1,
@@ -98,7 +97,7 @@ CREATE INDEX idx_zones_team_id ON zones(team_id);
 
 -- Desks
 CREATE TABLE desks (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   label VARCHAR(50) NOT NULL,
   zone_id UUID NOT NULL REFERENCES zones(id) ON DELETE CASCADE,
   desk_type VARCHAR(20) NOT NULL DEFAULT 'standard' CHECK (desk_type IN ('standard', 'standing', 'private', 'shared')),
@@ -115,7 +114,7 @@ CREATE INDEX idx_desks_zone_id ON desks(zone_id);
 
 -- Bookings
 CREATE TABLE bookings (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   desk_id UUID NOT NULL REFERENCES desks(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   date DATE NOT NULL,
