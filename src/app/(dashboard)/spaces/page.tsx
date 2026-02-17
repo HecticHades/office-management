@@ -16,15 +16,15 @@ export default async function SpacesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Spaces</h1>
-          <p className="text-muted-foreground">
+          <h1 className="font-[family-name:var(--font-display)] text-3xl tracking-tight text-stone-800">Spaces</h1>
+          <p className="text-stone-500 mt-1">
             Manage office zones and areas
           </p>
         </div>
         {session.user.role === 'admin' && (
           <ZoneForm
             trigger={
-              <Button>
+              <Button className="bg-teal-600 hover:bg-teal-700 text-white">
                 <Plus className="h-4 w-4 mr-2" />
                 Create Zone
               </Button>
@@ -34,16 +34,18 @@ export default async function SpacesPage() {
       </div>
 
       {error && (
-        <div className="rounded-md bg-destructive/10 p-4 text-sm text-destructive">
+        <div className="rounded-xl bg-destructive/10 p-4 text-sm text-destructive">
           {error}
         </div>
       )}
 
       {zones.length === 0 && !error ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16 text-muted-foreground">
-          <Map className="h-12 w-12 mb-4" />
-          <p className="text-lg font-medium">No zones yet</p>
-          <p className="text-sm">Create your first office zone to get started.</p>
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-stone-200 py-16">
+          <div className="mb-4 flex size-16 items-center justify-center rounded-full bg-stone-100">
+            <Map className="h-8 w-8 text-stone-400" />
+          </div>
+          <p className="text-lg font-semibold text-stone-700">No zones yet</p>
+          <p className="text-sm text-stone-500 mt-1">Create your first office zone to get started.</p>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

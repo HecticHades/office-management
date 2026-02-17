@@ -1,13 +1,13 @@
 'use client';
 
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
+  Area,
+  AreaChart,
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -18,9 +18,9 @@ type OccupancyChartProps = {
 export function OccupancyChart({ data }: OccupancyChartProps) {
   if (data.length === 0) {
     return (
-      <Card>
+      <Card className="rounded-xl border-stone-200 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-base">Occupancy Trend</CardTitle>
+          <CardTitle className="font-medium">Weekly Occupancy</CardTitle>
         </CardHeader>
         <CardContent className="py-8 text-center text-sm text-muted-foreground">
           No occupancy data available yet.
@@ -30,23 +30,29 @@ export function OccupancyChart({ data }: OccupancyChartProps) {
   }
 
   return (
-    <Card>
+    <Card className="rounded-xl border-stone-200 shadow-sm">
       <CardHeader>
-        <CardTitle className="text-base">Occupancy Trend (Last 7 Days)</CardTitle>
+        <CardTitle className="font-medium">Weekly Occupancy</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="h-[250px]">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+            <AreaChart data={data}>
+              <defs>
+                <linearGradient id="occupancyGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#99f6e4" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#99f6e4" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" />
               <XAxis
                 dataKey="date"
-                tick={{ fontSize: 12 }}
+                tick={{ fontSize: 12, fill: '#78716c' }}
                 tickLine={false}
                 axisLine={false}
               />
               <YAxis
-                tick={{ fontSize: 12 }}
+                tick={{ fontSize: 12, fill: '#78716c' }}
                 tickLine={false}
                 axisLine={false}
                 domain={[0, 100]}
@@ -55,20 +61,22 @@ export function OccupancyChart({ data }: OccupancyChartProps) {
               <Tooltip
                 formatter={(value) => [`${value}%`, 'Occupancy']}
                 contentStyle={{
-                  borderRadius: '8px',
-                  border: '1px solid hsl(var(--border))',
-                  backgroundColor: 'hsl(var(--background))',
+                  borderRadius: '12px',
+                  border: '1px solid #e7e5e4',
+                  backgroundColor: '#ffffff',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
                 }}
               />
-              <Line
+              <Area
                 type="monotone"
                 dataKey="occupancy"
-                stroke="#3b82f6"
+                stroke="#0d9488"
                 strokeWidth={2}
-                dot={{ r: 4, fill: '#3b82f6' }}
-                activeDot={{ r: 6 }}
+                fill="url(#occupancyGradient)"
+                dot={{ r: 4, fill: '#0d9488', stroke: '#ffffff', strokeWidth: 2 }}
+                activeDot={{ r: 6, fill: '#0d9488' }}
               />
-            </LineChart>
+            </AreaChart>
           </ResponsiveContainer>
         </div>
       </CardContent>

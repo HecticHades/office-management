@@ -139,21 +139,22 @@ export function BookingCalendar({ initialZones }: BookingCalendarProps) {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" onClick={() => setWeekOffset((w) => w - 1)}>
+          <Button variant="outline" size="icon" onClick={() => setWeekOffset((w) => w - 1)} className="border-stone-200 text-stone-600 hover:bg-stone-50">
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
             size="sm"
             onClick={() => setWeekOffset(0)}
+            className="border-teal-200 text-teal-700 hover:bg-teal-50"
           >
             <CalendarIcon className="h-4 w-4 mr-2" />
             This Week
           </Button>
-          <Button variant="outline" size="icon" onClick={() => setWeekOffset((w) => w + 1)}>
+          <Button variant="outline" size="icon" onClick={() => setWeekOffset((w) => w + 1)} className="border-stone-200 text-stone-600 hover:bg-stone-50">
             <ChevronRight className="h-4 w-4" />
           </Button>
-          <span className="text-sm text-muted-foreground ml-2">
+          <span className="text-sm text-stone-500 ml-2">
             {weekDates[0].toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             {' - '}
             {weekDates[6].toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -161,7 +162,7 @@ export function BookingCalendar({ initialZones }: BookingCalendarProps) {
         </div>
 
         <Select value={selectedZone} onValueChange={setSelectedZone}>
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="w-[200px] border-stone-200">
             <SelectValue placeholder="Filter by zone" />
           </SelectTrigger>
           <SelectContent>
@@ -176,17 +177,17 @@ export function BookingCalendar({ initialZones }: BookingCalendarProps) {
       </div>
 
       {/* Legend */}
-      <div className="flex gap-4 text-xs">
+      <div className="flex gap-4 text-xs text-stone-600">
         <div className="flex items-center gap-1.5">
-          <div className="h-3 w-3 rounded bg-green-500" />
+          <div className="h-3 w-3 rounded bg-emerald-500" />
           <span>Available</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="h-3 w-3 rounded bg-blue-500" />
+          <div className="h-3 w-3 rounded bg-teal-500" />
           <span>My Booking</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="h-3 w-3 rounded bg-slate-400" />
+          <div className="h-3 w-3 rounded bg-stone-400" />
           <span>Occupied</span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -208,11 +209,11 @@ export function BookingCalendar({ initialZones }: BookingCalendarProps) {
           </CardContent>
         </Card>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto rounded-xl border border-stone-200">
           <table className="w-full border-collapse">
             <thead>
               <tr>
-                <th className="border p-2 text-left text-sm font-medium bg-muted min-w-[120px]">
+                <th className="border-b border-r border-stone-200 p-2 text-left text-sm font-medium text-stone-600 bg-stone-50 min-w-[120px]">
                   Desk
                 </th>
                 {weekDates.map((date) => {
@@ -222,12 +223,12 @@ export function BookingCalendar({ initialZones }: BookingCalendarProps) {
                     <th
                       key={dateKey}
                       className={cn(
-                        'border p-2 text-center text-sm font-medium min-w-[100px]',
-                        isToday ? 'bg-blue-50' : 'bg-muted'
+                        'border-b border-r border-stone-200 p-2 text-center text-sm font-medium min-w-[100px] last:border-r-0',
+                        isToday ? 'bg-teal-50' : 'bg-stone-50'
                       )}
                     >
-                      <div>{date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
-                      <div className={cn('text-xs', isToday ? 'text-blue-600 font-semibold' : 'text-muted-foreground')}>
+                      <div className="text-stone-600">{date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+                      <div className={cn('text-xs', isToday ? 'text-teal-600 font-semibold' : 'text-stone-400')}>
                         {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                       </div>
                     </th>
@@ -237,10 +238,10 @@ export function BookingCalendar({ initialZones }: BookingCalendarProps) {
             </thead>
             <tbody>
               {filteredDesks.map((desk) => (
-                <tr key={desk.id}>
-                  <td className="border p-2">
-                    <div className="font-medium text-sm">{desk.label}</div>
-                    <div className="text-xs text-muted-foreground">{desk.zone.name}</div>
+                <tr key={desk.id} className="hover:bg-stone-50/50">
+                  <td className="border-b border-r border-stone-200 p-2">
+                    <div className="font-medium text-sm text-stone-800">{desk.label}</div>
+                    <div className="text-xs text-stone-400">{desk.zone.name}</div>
                   </td>
                   {weekDates.map((date) => {
                     const dateKey = formatDateKey(date);
@@ -251,13 +252,13 @@ export function BookingCalendar({ initialZones }: BookingCalendarProps) {
                       <td
                         key={dateKey}
                         className={cn(
-                          'border p-1',
-                          isToday && 'bg-blue-50/50'
+                          'border-b border-r border-stone-200 p-1 last:border-r-0',
+                          isToday && 'bg-teal-50/30'
                         )}
                       >
                         {isMaintenance ? (
                           <div className="flex justify-center">
-                            <Badge variant="outline" className="bg-amber-100 text-amber-800 text-[10px]">
+                            <Badge variant="outline" className="rounded-full bg-amber-50 text-amber-700 border-amber-200 text-[10px]">
                               Maintenance
                             </Badge>
                           </div>
@@ -273,9 +274,9 @@ export function BookingCalendar({ initialZones }: BookingCalendarProps) {
                                   key={slot}
                                   className={cn(
                                     'rounded px-1.5 py-0.5 text-[10px] font-medium text-white',
-                                    status === 'available' && 'bg-green-500',
-                                    status === 'mine' && 'bg-blue-500',
-                                    status === 'booked' && 'bg-slate-400'
+                                    status === 'available' && 'bg-emerald-500',
+                                    status === 'mine' && 'bg-teal-500',
+                                    status === 'booked' && 'bg-stone-400'
                                   )}
                                   title={`${TIME_SLOT_LABELS[slot]}: ${status}`}
                                 >

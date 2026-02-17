@@ -78,12 +78,14 @@ export function BookingDialog({
           <DialogTitle>Book a Desk</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <div className="flex items-center gap-3 rounded-lg border p-3 bg-muted/50">
-            <Monitor className="h-5 w-5 text-muted-foreground" />
+          <div className="flex items-center gap-3 rounded-xl border border-stone-200 p-3 bg-stone-50/50">
+            <div className="flex size-10 items-center justify-center rounded-lg bg-teal-50">
+              <Monitor className="h-5 w-5 text-teal-600" />
+            </div>
             <div>
-              <p className="font-medium">{deskLabel}</p>
-              <p className="text-sm text-muted-foreground">
-                {zoneName} &middot; <Badge variant="outline" className="text-xs">{deskType}</Badge>
+              <p className="font-medium text-stone-800">{deskLabel}</p>
+              <p className="text-sm text-stone-500">
+                {zoneName} &middot; <Badge variant="outline" className="text-xs rounded-full border-stone-200">{deskType}</Badge>
               </p>
             </div>
           </div>
@@ -131,10 +133,11 @@ export function BookingDialog({
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isPending}
+              className="border-stone-200"
             >
               Cancel
             </Button>
-            <Button onClick={handleSubmit} disabled={isPending || !timeSlot}>
+            <Button onClick={handleSubmit} disabled={isPending || !timeSlot} className="bg-teal-600 hover:bg-teal-700 text-white">
               {isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />

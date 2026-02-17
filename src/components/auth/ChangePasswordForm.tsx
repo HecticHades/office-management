@@ -14,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { KeyRound, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import zxcvbn from 'zxcvbn';
@@ -46,9 +47,16 @@ const strengthLabels = ['Very Weak', 'Weak', 'Fair', 'Strong', 'Very Strong'];
 const strengthColors = [
   'bg-red-500',
   'bg-orange-500',
-  'bg-yellow-500',
-  'bg-green-500',
-  'bg-emerald-500',
+  'bg-amber-500',
+  'bg-teal-400',
+  'bg-teal-600',
+];
+const strengthBadgeVariants: Array<'destructive' | 'outline' | 'secondary' | 'default'> = [
+  'destructive',
+  'destructive',
+  'outline',
+  'secondary',
+  'default',
 ];
 
 export function ChangePasswordForm() {
@@ -66,20 +74,22 @@ export function ChangePasswordForm() {
   }, [state, router]);
 
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader className="text-center">
-        <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-          <KeyRound className="h-6 w-6" />
+    <Card className="w-full max-w-md rounded-xl border-stone-200 shadow-lg">
+      <CardHeader className="text-center pb-2 pt-8">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-600 text-white">
+          <KeyRound className="h-7 w-7" />
         </div>
-        <CardTitle className="text-2xl">Change Password</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-3xl font-[family-name:var(--font-display)] tracking-tight">
+          Update Your Password
+        </CardTitle>
+        <CardDescription className="text-muted-foreground">
           Please set a new password for your account
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <form action={formAction} className="space-y-4">
+      <CardContent className="px-8 pb-8">
+        <form action={formAction} className="space-y-5">
           {state?.error && (
-            <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+            <div className="rounded-lg border-l-4 border-red-500 bg-red-50 p-3 text-sm text-red-700">
               {state.error}
             </div>
           )}
@@ -92,6 +102,7 @@ export function ChangePasswordForm() {
               required
               autoComplete="current-password"
               placeholder="Enter current password"
+              className="h-11 border-stone-300 focus:ring-teal-500 focus:border-teal-500"
             />
           </div>
           <div className="space-y-2">
@@ -105,25 +116,26 @@ export function ChangePasswordForm() {
               placeholder="Enter new password (min 12 characters)"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
+              className="h-11 border-stone-300 focus:ring-teal-500 focus:border-teal-500"
             />
             {strength && (
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <div className="flex gap-1">
                   {[0, 1, 2, 3].map((i) => (
                     <div
                       key={i}
                       className={cn(
-                        'h-1.5 flex-1 rounded-full transition-colors',
+                        'h-2 flex-1 rounded-full transition-colors',
                         i <= strength.score
                           ? strengthColors[strength.score]
-                          : 'bg-muted'
+                          : 'bg-stone-200'
                       )}
                     />
                   ))}
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <Badge variant={strengthBadgeVariants[strength.score]} className="text-xs">
                   {strengthLabels[strength.score]}
-                </p>
+                </Badge>
               </div>
             )}
           </div>
@@ -136,9 +148,14 @@ export function ChangePasswordForm() {
               required
               autoComplete="new-password"
               placeholder="Confirm new password"
+              className="h-11 border-stone-300 focus:ring-teal-500 focus:border-teal-500"
             />
           </div>
-          <Button type="submit" className="w-full" disabled={isPending}>
+          <Button
+            type="submit"
+            className="w-full h-11 rounded-lg bg-teal-600 hover:bg-teal-700 text-white"
+            disabled={isPending}
+          >
             {isPending ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />

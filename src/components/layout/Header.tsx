@@ -1,6 +1,6 @@
 'use client';
 
-import { Menu } from 'lucide-react';
+import { Bell, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -17,14 +17,14 @@ export function Header() {
 
   return (
     <>
-      <header className="flex h-14 items-center gap-4 border-b bg-background px-4 lg:px-6">
+      <header className="flex h-16 items-center gap-4 border-b border-stone-200 bg-white px-4 lg:px-6">
         <Button
           variant="ghost"
           size="icon"
           className="lg:hidden"
           onClick={() => setSidebarOpen(true)}
         >
-          <Menu className="h-5 w-5" />
+          <Menu className="size-5" />
           <span className="sr-only">Toggle sidebar</span>
         </Button>
 
@@ -32,7 +32,13 @@ export function Header() {
           <Breadcrumbs />
         </div>
 
-        <UserMenu />
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" className="text-muted-foreground">
+            <Bell className="size-[18px]" />
+            <span className="sr-only">Notifications</span>
+          </Button>
+          <UserMenu />
+        </div>
       </header>
 
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>

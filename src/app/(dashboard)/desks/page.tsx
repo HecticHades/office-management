@@ -22,8 +22,8 @@ export default async function DesksPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Desks</h1>
-          <p className="text-muted-foreground">
+          <h1 className="font-[family-name:var(--font-display)] text-3xl tracking-tight text-stone-800">Desks</h1>
+          <p className="text-stone-500 mt-1">
             View and manage all office desks
           </p>
         </div>

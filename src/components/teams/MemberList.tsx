@@ -90,49 +90,49 @@ export function MemberList({ teamId, members: initialMembers }: MemberListProps)
 
   if (sortedMembers.length === 0) {
     return (
-      <div className="rounded-lg border p-8 text-center text-muted-foreground">
+      <div className="rounded-xl border border-stone-200 bg-stone-50/50 p-8 text-center text-stone-500">
         No members in this team yet.
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg border">
+    <div className="rounded-xl border border-stone-200 overflow-hidden">
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead>Member</TableHead>
-            <TableHead>Username</TableHead>
-            <TableHead>Team Role</TableHead>
-            {canManageTeam && <TableHead className="w-[100px]">Actions</TableHead>}
+          <TableRow className="bg-stone-50/80 hover:bg-stone-50/80">
+            <TableHead className="text-stone-600">Member</TableHead>
+            <TableHead className="text-stone-600">Username</TableHead>
+            <TableHead className="text-stone-600">Team Role</TableHead>
+            {canManageTeam && <TableHead className="w-[100px] text-stone-600">Actions</TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>
           {sortedMembers.map((member) => (
-            <TableRow key={member.id}>
+            <TableRow key={member.id} className="hover:bg-stone-50/50">
               <TableCell>
                 <div className="flex items-center gap-3">
                   <Avatar className="size-8">
-                    <AvatarFallback className="text-xs">
+                    <AvatarFallback className="text-xs bg-stone-100 text-stone-600">
                       {getInitials(member.user.display_name)}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="font-medium">
+                  <span className="font-medium text-stone-800">
                     {member.user.display_name}
                   </span>
                 </div>
               </TableCell>
-              <TableCell className="text-muted-foreground">
+              <TableCell className="text-stone-500">
                 {member.user.username}
               </TableCell>
               <TableCell>
                 {member.role === 'lead' ? (
-                  <Badge className="gap-1 bg-amber-500/15 text-amber-600 border-amber-500/20">
+                  <Badge className="gap-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
                     <Crown className="size-3" />
                     Lead
                   </Badge>
                 ) : (
-                  <Badge variant="outline">Member</Badge>
+                  <Badge variant="outline" className="rounded-full border-teal-200 bg-teal-50 text-teal-700">Member</Badge>
                 )}
               </TableCell>
               {canManageTeam && (

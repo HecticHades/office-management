@@ -92,8 +92,8 @@ export function ResetPasswordDialog({
                 <strong>{user?.display_name}</strong> ({user?.username})?
               </DialogDescription>
             </DialogHeader>
-            <div className="rounded-md border border-yellow-500/20 bg-yellow-500/10 p-3">
-              <div className="flex items-start gap-2 text-sm text-yellow-600">
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-3">
+              <div className="flex items-start gap-2 text-sm text-amber-700">
                 <AlertTriangle className="size-4 mt-0.5 shrink-0" />
                 <span>
                   This will generate a new temporary password and revoke all
@@ -103,13 +103,13 @@ export function ResetPasswordDialog({
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={handleClose}>
+              <Button variant="outline" onClick={handleClose} className="border-stone-200">
                 Cancel
               </Button>
               <Button
-                variant="destructive"
                 onClick={handleConfirm}
                 disabled={isPending}
+                className="bg-amber-600 hover:bg-amber-700 text-white"
               >
                 {isPending ? (
                   <>

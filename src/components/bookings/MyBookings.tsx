@@ -73,23 +73,23 @@ export function MyBookings() {
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="rounded-xl border-stone-200 bg-white shadow-sm">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-stone-800">
+            <Calendar className="h-5 w-5 text-teal-600" />
             Upcoming Bookings
           </CardTitle>
         </CardHeader>
         <CardContent>
           {upcoming.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-4 text-center">
+            <p className="text-sm text-stone-500 py-4 text-center">
               No upcoming bookings
             </p>
           ) : (
             <div className="space-y-4">
               {groupByDate(upcoming).map(([date, items]) => (
                 <div key={date}>
-                  <h4 className="text-sm font-medium text-muted-foreground mb-2">
+                  <h4 className="text-sm font-medium text-stone-500 mb-2">
                     {new Date(date + 'T00:00:00').toLocaleDateString('en-US', {
                       weekday: 'long',
                       month: 'long',
@@ -100,12 +100,12 @@ export function MyBookings() {
                     {items.map((booking) => (
                       <div
                         key={booking.id}
-                        className="flex items-center justify-between rounded-lg border p-3"
+                        className="flex items-center justify-between rounded-xl border border-stone-200 p-3 hover:bg-stone-50/50 transition-colors"
                       >
                         <div className="flex items-center gap-3">
                           <div>
-                            <p className="font-medium text-sm">{booking.desk.label}</p>
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <p className="font-medium text-sm text-stone-800">{booking.desk.label}</p>
+                            <div className="flex items-center gap-2 text-xs text-stone-400">
                               <MapPin className="h-3 w-3" />
                               {booking.desk.zone.name}
                               <Clock className="h-3 w-3 ml-1" />
@@ -118,6 +118,7 @@ export function MyBookings() {
                           size="sm"
                           onClick={() => handleCancel(booking.id)}
                           disabled={cancellingId === booking.id}
+                          className="text-stone-500 hover:text-red-600 hover:bg-red-50"
                         >
                           {cancellingId === booking.id ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -139,15 +140,15 @@ export function MyBookings() {
       </Card>
 
       {past.length > 0 && (
-        <Card>
+        <Card className="rounded-xl border-stone-200 bg-white shadow-sm">
           <CardHeader>
-            <CardTitle className="text-sm text-muted-foreground">Past Bookings</CardTitle>
+            <CardTitle className="text-sm text-stone-400">Past Bookings</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               {groupByDate(past).slice(-5).map(([date, items]) => (
                 <div key={date}>
-                  <h4 className="text-xs font-medium text-muted-foreground mb-1">
+                  <h4 className="text-xs font-medium text-stone-400 mb-1">
                     {new Date(date + 'T00:00:00').toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
@@ -156,10 +157,10 @@ export function MyBookings() {
                   {items.map((booking) => (
                     <div
                       key={booking.id}
-                      className="flex items-center gap-3 rounded-lg border p-2 opacity-60"
+                      className="flex items-center gap-3 rounded-xl border border-stone-100 p-2 opacity-60"
                     >
-                      <p className="text-sm">{booking.desk.label}</p>
-                      <Badge variant="outline" className="text-xs">
+                      <p className="text-sm text-stone-600">{booking.desk.label}</p>
+                      <Badge variant="outline" className="text-xs rounded-full border-stone-200 text-stone-500">
                         {booking.desk.zone.name}
                       </Badge>
                     </div>

@@ -13,11 +13,8 @@ export default async function AuditLogPage() {
   return (
     <div className="space-y-6">
       <div>
-        <div className="flex items-center gap-2">
-          <ScrollText className="size-6 text-primary" />
-          <h1 className="text-3xl font-bold tracking-tight">Audit Log</h1>
-        </div>
-        <p className="text-muted-foreground mt-1">
+        <h1 className="font-[family-name:var(--font-display)] text-3xl tracking-tight text-stone-800">Audit Log</h1>
+        <p className="text-stone-500 mt-1">
           Review authentication and administrative actions.
         </p>
       </div>

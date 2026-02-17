@@ -14,7 +14,6 @@ import {
   Shield,
   Users,
 } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
 
 const mainNavItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -32,65 +31,85 @@ export function Sidebar({ className }: { className?: string }) {
   return (
     <aside
       className={cn(
-        'flex h-full w-64 flex-col bg-slate-900 text-white',
+        'flex h-full w-64 flex-col bg-[oklch(0.18_0.02_260)]',
         className
       )}
     >
-      <div className="flex h-14 items-center gap-2 border-b border-slate-700 px-4">
-        <Building2 className="h-6 w-6 text-blue-400" />
-        <span className="text-lg font-semibold">Office Mgmt</span>
+      {/* Branding */}
+      <div className="flex h-16 items-center gap-3 px-5">
+        <div className="flex size-8 items-center justify-center rounded-lg bg-teal-600">
+          <Building2 className="size-[18px] text-white" />
+        </div>
+        <span className="font-[family-name:var(--font-display)] text-lg italic text-white">
+          OfficeSpace
+        </span>
       </div>
 
-      <nav className="flex-1 space-y-1 overflow-y-auto p-3">
-        {mainNavItems.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
-          return (
+      <nav className="flex-1 overflow-y-auto px-3 pt-4">
+        {/* Workspace section */}
+        <div className="mb-2 px-3 text-[11px] font-medium uppercase tracking-widest text-stone-500">
+          Workspace
+        </div>
+        <div className="space-y-0.5">
+          {mainNavItems.map((item) => {
+            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
+                  isActive
+                    ? 'border-l-[3px] border-teal-400 bg-teal-600/20 text-teal-400'
+                    : 'border-l-[3px] border-transparent text-stone-400 hover:bg-white/5 hover:text-white'
+                )}
+              >
+                <item.icon className="size-[18px] shrink-0" />
+                {item.label}
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* System section */}
+        <div className="mb-2 mt-8 px-3 text-[11px] font-medium uppercase tracking-widest text-stone-500">
+          System
+        </div>
+        <div className="space-y-0.5">
+          {isAdmin && (
             <Link
-              key={item.href}
-              href={item.href}
+              href="/admin"
               className={cn(
-                'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-blue-600 text-white'
-                  : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
+                pathname.startsWith('/admin')
+                  ? 'border-l-[3px] border-teal-400 bg-teal-600/20 text-teal-400'
+                  : 'border-l-[3px] border-transparent text-stone-400 hover:bg-white/5 hover:text-white'
               )}
             >
-              <item.icon className="h-4 w-4 shrink-0" />
-              {item.label}
+              <Shield className="size-[18px] shrink-0" />
+              Admin
             </Link>
-          );
-        })}
+          )}
 
-        <Separator className="my-3 bg-slate-700" />
-
-        {isAdmin && (
           <Link
-            href="/admin"
+            href="/settings"
             className={cn(
-              'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-              pathname.startsWith('/admin')
-                ? 'bg-blue-600 text-white'
-                : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+              'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
+              pathname.startsWith('/settings')
+                ? 'border-l-[3px] border-teal-400 bg-teal-600/20 text-teal-400'
+                : 'border-l-[3px] border-transparent text-stone-400 hover:bg-white/5 hover:text-white'
             )}
           >
-            <Shield className="h-4 w-4 shrink-0" />
-            Admin
+            <Settings className="size-[18px] shrink-0" />
+            Settings
           </Link>
-        )}
-
-        <Link
-          href="/settings"
-          className={cn(
-            'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-            pathname.startsWith('/settings')
-              ? 'bg-blue-600 text-white'
-              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-          )}
-        >
-          <Settings className="h-4 w-4 shrink-0" />
-          Settings
-        </Link>
+        </div>
       </nav>
+
+      {/* Bottom section */}
+      <div className="border-t border-white/10 px-5 py-4">
+        <span className="text-xs text-stone-600">v1.0</span>
+      </div>
     </aside>
   );
 }

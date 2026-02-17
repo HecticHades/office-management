@@ -60,7 +60,7 @@ export function CreateUserDialog() {
   return (
     <Dialog open={open} onOpenChange={(v) => (v ? setOpen(true) : handleClose())}>
       <DialogTrigger asChild>
-        <Button>
+        <Button className="bg-teal-600 hover:bg-teal-700 text-white">
           <UserPlus className="size-4" />
           Create User
         </Button>
@@ -96,7 +96,7 @@ export function CreateUserDialog() {
               </div>
             </div>
             <DialogFooter>
-              <Button onClick={handleClose}>Done</Button>
+              <Button onClick={handleClose} className="bg-teal-600 hover:bg-teal-700 text-white">Done</Button>
             </DialogFooter>
           </>
         ) : (
@@ -146,10 +146,11 @@ export function CreateUserDialog() {
                   type="button"
                   variant="outline"
                   onClick={handleClose}
+                  className="border-stone-200"
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isPending}>
+                <Button type="submit" disabled={isPending} className="bg-teal-600 hover:bg-teal-700 text-white">
                   {isPending ? (
                     <>
                       <Loader2 className="size-4 animate-spin" />

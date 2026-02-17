@@ -62,17 +62,17 @@ function getRoleBadge(role: User['role']) {
 
 function getStatusBadge(user: User) {
   if (!user.is_active) {
-    return <Badge variant="destructive">Disabled</Badge>;
+    return <Badge className="rounded-full bg-stone-100 text-stone-600 border border-stone-200">Disabled</Badge>;
   }
   if (user.locked_until && new Date(user.locked_until) > new Date()) {
     return (
-      <Badge className="bg-yellow-500/15 text-yellow-600 border-yellow-500/20">
+      <Badge className="rounded-full bg-amber-50 text-amber-700 border border-amber-200">
         Locked
       </Badge>
     );
   }
   return (
-    <Badge className="bg-green-500/15 text-green-600 border-green-500/20">
+    <Badge className="rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
       Active
     </Badge>
   );
@@ -144,15 +144,15 @@ export function UserList({ users: initialUsers }: { users: User[] }) {
 
   return (
     <>
-      <div className="rounded-lg border">
+      <div className="rounded-xl border border-stone-200 overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Username</TableHead>
-              <TableHead>Display Name</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Last Login</TableHead>
+            <TableRow className="bg-stone-50/80 hover:bg-stone-50/80">
+              <TableHead className="text-stone-600">Username</TableHead>
+              <TableHead className="text-stone-600">Display Name</TableHead>
+              <TableHead className="text-stone-600">Role</TableHead>
+              <TableHead className="text-stone-600">Status</TableHead>
+              <TableHead className="text-stone-600">Last Login</TableHead>
               <TableHead className="w-[50px]" />
             </TableRow>
           </TableHeader>
@@ -168,12 +168,12 @@ export function UserList({ users: initialUsers }: { users: User[] }) {
               </TableRow>
             ) : (
               users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell className="font-medium">{user.username}</TableCell>
-                  <TableCell>{user.display_name}</TableCell>
+                <TableRow key={user.id} className="hover:bg-stone-50/50">
+                  <TableCell className="font-medium text-stone-800">{user.username}</TableCell>
+                  <TableCell className="text-stone-600">{user.display_name}</TableCell>
                   <TableCell>{getRoleBadge(user.role)}</TableCell>
                   <TableCell>{getStatusBadge(user)}</TableCell>
-                  <TableCell className="text-muted-foreground">
+                  <TableCell className="text-stone-400">
                     {user.last_login_at
                       ? formatRelative(user.last_login_at)
                       : 'Never'}

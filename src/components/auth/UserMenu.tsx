@@ -36,17 +36,23 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring">
-          <Avatar>
-            <AvatarFallback>{getInitials(user.display_name)}</AvatarFallback>
+        <button className="flex items-center gap-2.5 rounded-full outline-none transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring">
+          <Avatar className="size-8">
+            <AvatarFallback className="bg-gradient-to-br from-teal-500 to-teal-700 text-xs font-medium text-white">
+              {getInitials(user.display_name)}
+            </AvatarFallback>
           </Avatar>
+          <div className="hidden items-start gap-1 md:flex md:flex-col">
+            <span className="text-sm font-medium text-foreground">{user.display_name}</span>
+            <span className="text-xs text-muted-foreground">{roleLabels[user.role] || user.role}</span>
+          </div>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>
           <div className="flex flex-col gap-1">
             <span className="text-sm font-medium">{user.display_name}</span>
-            <Badge variant="secondary" className="w-fit text-xs">
+            <Badge className="w-fit bg-teal-600/10 text-xs text-teal-700 hover:bg-teal-600/10">
               {roleLabels[user.role] || user.role}
             </Badge>
           </div>

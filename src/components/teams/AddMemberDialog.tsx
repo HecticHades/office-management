@@ -76,7 +76,7 @@ export function AddMemberDialog({ teamId }: AddMemberDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm">
+        <Button size="sm" className="bg-teal-600 hover:bg-teal-700 text-white">
           <UserPlus className="size-4" />
           Add Member
         </Button>
@@ -129,12 +129,13 @@ export function AddMemberDialog({ teamId }: AddMemberDialogProps) {
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>
+          <Button variant="outline" onClick={() => setOpen(false)} className="border-stone-200">
             Cancel
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={isPending || !selectedUserId}
+            className="bg-teal-600 hover:bg-teal-700 text-white"
           >
             {isPending ? (
               <>

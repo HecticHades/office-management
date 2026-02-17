@@ -24,8 +24,10 @@ export default async function DashboardLayout({
         </div>
         <div className="flex flex-1 flex-col overflow-hidden">
           <Header />
-          <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-            {children}
+          <main className="bg-blueprint flex-1 overflow-y-auto p-6 lg:p-8">
+            <div className="mx-auto w-full max-w-7xl">
+              {children}
+            </div>
           </main>
         </div>
       </div>

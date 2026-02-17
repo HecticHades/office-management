@@ -60,7 +60,7 @@ export function TeamForm({ team, trigger }: TeamFormProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger ?? (
-          <Button>
+          <Button className="bg-teal-600 hover:bg-teal-700 text-white">
             {isEditing ? (
               <>
                 <Pencil className="size-4" />
@@ -137,10 +137,11 @@ export function TeamForm({ team, trigger }: TeamFormProps) {
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
+              className="border-stone-200"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" disabled={isPending} className="bg-teal-600 hover:bg-teal-700 text-white">
               {isPending ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />

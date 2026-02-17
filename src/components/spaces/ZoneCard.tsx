@@ -13,26 +13,24 @@ type ZoneCardProps = {
 export function ZoneCard({ zone }: ZoneCardProps) {
   return (
     <Link href={`/spaces/${zone.id}`}>
-      <Card className="transition-shadow hover:shadow-md cursor-pointer h-full">
+      <Card className="rounded-xl border-stone-200 bg-white shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 cursor-pointer h-full overflow-hidden">
+        <div
+          className="h-1 w-full"
+          style={{ backgroundColor: zone.color }}
+        />
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
-            <div className="flex items-center gap-2">
-              <div
-                className="h-3 w-3 rounded-full"
-                style={{ backgroundColor: zone.color }}
-              />
-              <CardTitle className="text-lg">{zone.name}</CardTitle>
-            </div>
-            <Badge variant="outline">Floor {zone.floor}</Badge>
+            <CardTitle className="text-lg font-semibold text-stone-800">{zone.name}</CardTitle>
+            <Badge variant="outline" className="rounded-full border-stone-200 text-stone-500 text-xs">Floor {zone.floor}</Badge>
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
           {zone.description && (
-            <p className="text-sm text-muted-foreground line-clamp-2">
+            <p className="text-sm text-stone-500 line-clamp-2">
               {zone.description}
             </p>
           )}
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          <div className="flex items-center gap-4 text-sm text-stone-400">
             <div className="flex items-center gap-1">
               <Monitor className="h-4 w-4" />
               <span>{zone.deskCount} desks</span>
@@ -44,14 +42,13 @@ export function ZoneCard({ zone }: ZoneCardProps) {
           </div>
           {zone.team && (
             <div className="flex items-center gap-1.5">
-              <Map className="h-3.5 w-3.5 text-muted-foreground" />
               <Badge
                 variant="secondary"
-                className="text-xs"
+                className="text-xs rounded-full"
                 style={{
-                  backgroundColor: `${zone.team.color}20`,
+                  backgroundColor: `${zone.team.color}15`,
                   color: zone.team.color,
-                  borderColor: `${zone.team.color}40`,
+                  borderColor: `${zone.team.color}30`,
                 }}
               >
                 {zone.team.name}

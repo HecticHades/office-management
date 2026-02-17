@@ -15,8 +15,8 @@ export default async function BookingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Bookings</h1>
-        <p className="text-muted-foreground">
+        <h1 className="font-[family-name:var(--font-display)] text-3xl tracking-tight text-stone-800">Bookings</h1>
+        <p className="text-stone-500 mt-1">
           Book desks and manage your reservations
         </p>
       </div>

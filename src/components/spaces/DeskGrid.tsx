@@ -12,9 +12,9 @@ type DeskGridProps = {
 };
 
 const statusConfig = {
-  available: { color: 'bg-green-100 border-green-300 text-green-800', icon: Monitor, label: 'Available' },
-  maintenance: { color: 'bg-amber-100 border-amber-300 text-amber-800', icon: Wrench, label: 'Maintenance' },
-  reserved: { color: 'bg-slate-100 border-slate-300 text-slate-800', icon: Monitor, label: 'Reserved' },
+  available: { color: 'bg-emerald-50 border-emerald-200 text-emerald-700', icon: Monitor, label: 'Available' },
+  maintenance: { color: 'bg-amber-50 border-amber-200 text-amber-700', icon: Wrench, label: 'Maintenance' },
+  reserved: { color: 'bg-stone-50 border-stone-200 text-stone-600', icon: Monitor, label: 'Reserved' },
 } as const;
 
 const typeLabels: Record<Desk['desk_type'], string> = {
@@ -27,9 +27,11 @@ const typeLabels: Record<Desk['desk_type'], string> = {
 export function DeskGrid({ desks, onDeskClick }: DeskGridProps) {
   if (desks.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-        <Monitor className="h-10 w-10 mb-3" />
-        <p className="text-sm">No desks in this zone yet.</p>
+      <div className="flex flex-col items-center justify-center py-12">
+        <div className="mb-3 flex size-14 items-center justify-center rounded-full bg-stone-100">
+          <Monitor className="h-6 w-6 text-stone-400" />
+        </div>
+        <p className="text-sm text-stone-500">No desks in this zone yet.</p>
       </div>
     );
   }
@@ -44,7 +46,7 @@ export function DeskGrid({ desks, onDeskClick }: DeskGridProps) {
           <Card
             key={desk.id}
             className={cn(
-              'cursor-pointer transition-shadow hover:shadow-md border-2',
+              'cursor-pointer rounded-xl border transition-all duration-200 hover:shadow-md hover:-translate-y-0.5',
               config.color
             )}
             onClick={() => onDeskClick?.(desk)}
@@ -52,10 +54,10 @@ export function DeskGrid({ desks, onDeskClick }: DeskGridProps) {
             <CardContent className="p-3 space-y-2">
               <div className="flex items-center justify-between">
                 <span className="font-semibold text-sm">{desk.label}</span>
-                <Icon className="h-4 w-4" />
+                <Icon className="h-4 w-4 opacity-60" />
               </div>
               <div className="flex flex-wrap gap-1">
-                <Badge variant="outline" className="text-xs">
+                <Badge variant="outline" className="text-xs rounded-full border-current/20">
                   {typeLabels[desk.desk_type]}
                 </Badge>
               </div>

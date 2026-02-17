@@ -35,7 +35,9 @@ export function TimeSlotPicker({ value, onChange, bookedSlots = [] }: TimeSlotPi
             type="button"
             variant={value === slot.value ? 'default' : 'outline'}
             className={cn(
-              'h-auto flex-col gap-1 py-3',
+              'h-auto flex-col gap-1 py-3 rounded-xl',
+              value === slot.value && 'bg-teal-600 hover:bg-teal-700 text-white',
+              value !== slot.value && 'border-stone-200 hover:bg-stone-50',
               disabled && 'opacity-50 cursor-not-allowed'
             )}
             disabled={disabled}
@@ -43,7 +45,7 @@ export function TimeSlotPicker({ value, onChange, bookedSlots = [] }: TimeSlotPi
           >
             <Icon className="h-4 w-4" />
             <span className="text-xs font-medium">{slot.label}</span>
-            <span className="text-[10px] text-muted-foreground">
+            <span className={cn('text-[10px]', value === slot.value ? 'text-teal-100' : 'text-stone-400')}>
               {disabled ? 'Booked' : slot.description}
             </span>
           </Button>

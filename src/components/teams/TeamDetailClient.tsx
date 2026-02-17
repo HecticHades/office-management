@@ -66,10 +66,10 @@ export function TeamDetailClient({ team, isAdmin }: TeamDetailClientProps) {
               className="size-4 rounded-full shrink-0"
               style={{ backgroundColor: team.color }}
             />
-            <h1 className="text-3xl font-bold tracking-tight">{team.name}</h1>
+            <h1 className="font-[family-name:var(--font-display)] text-3xl tracking-tight text-stone-800">{team.name}</h1>
           </div>
           {team.description && (
-            <p className="text-muted-foreground mt-1 ml-7">
+            <p className="text-stone-500 mt-1 ml-7">
               {team.description}
             </p>
           )}
@@ -124,12 +124,12 @@ export function TeamDetailClient({ team, isAdmin }: TeamDetailClientProps) {
         )}
       </div>
 
-      <Card>
+      <Card className="rounded-xl border-stone-200 bg-white shadow-sm">
         <CardHeader className="flex-row items-center justify-between space-y-0">
-          <CardTitle className="flex items-center gap-2">
-            <Users className="size-5" />
+          <CardTitle className="flex items-center gap-2 text-stone-800">
+            <Users className="size-5 text-stone-500" />
             Members
-            <Badge variant="secondary">{team.members.length}</Badge>
+            <Badge variant="secondary" className="rounded-full bg-stone-100 text-stone-600">{team.members.length}</Badge>
           </CardTitle>
           {isAdmin && <AddMemberDialog teamId={team.id} />}
         </CardHeader>

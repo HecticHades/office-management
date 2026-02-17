@@ -102,15 +102,15 @@ export function AuditLog({ initialLogs, initialTotal }: AuditLogProps) {
         </span>
       </div>
 
-      <div className="rounded-lg border">
+      <div className="rounded-xl border border-stone-200 overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Timestamp</TableHead>
-              <TableHead>User</TableHead>
-              <TableHead>Action</TableHead>
-              <TableHead>Details</TableHead>
-              <TableHead>IP Address</TableHead>
+            <TableRow className="bg-stone-50/80 hover:bg-stone-50/80">
+              <TableHead className="text-stone-600">Timestamp</TableHead>
+              <TableHead className="text-stone-600">User</TableHead>
+              <TableHead className="text-stone-600">Action</TableHead>
+              <TableHead className="text-stone-600">Details</TableHead>
+              <TableHead className="text-stone-600">IP Address</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -125,18 +125,18 @@ export function AuditLog({ initialLogs, initialTotal }: AuditLogProps) {
               </TableRow>
             ) : (
               filteredLogs.map((log) => (
-                <TableRow key={log.id}>
-                  <TableCell className="text-muted-foreground">
+                <TableRow key={log.id} className="hover:bg-stone-50/50">
+                  <TableCell className="text-stone-400">
                     {formatDateTime(log.created_at)}
                   </TableCell>
-                  <TableCell className="font-medium">
+                  <TableCell className="font-medium text-stone-800">
                     {log.username ?? '-'}
                   </TableCell>
                   <TableCell>{getActionBadge(log.action)}</TableCell>
-                  <TableCell className="max-w-[300px] truncate text-muted-foreground text-xs font-mono">
+                  <TableCell className="max-w-[300px] truncate text-stone-400 text-xs font-mono">
                     {formatDetails(log.details)}
                   </TableCell>
-                  <TableCell className="text-muted-foreground font-mono text-xs">
+                  <TableCell className="text-stone-400 font-mono text-xs">
                     {log.ip_address ?? '-'}
                   </TableCell>
                 </TableRow>

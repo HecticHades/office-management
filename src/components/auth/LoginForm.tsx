@@ -31,18 +31,22 @@ export function LoginForm() {
   const [state, formAction, isPending] = useActionState(loginAction, null);
 
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader className="text-center">
-        <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-          <Building2 className="h-6 w-6" />
+    <Card className="w-full max-w-md rounded-xl border-stone-200 shadow-lg">
+      <CardHeader className="text-center pb-2 pt-8">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-600 text-white">
+          <Building2 className="h-7 w-7" />
         </div>
-        <CardTitle className="text-2xl">Office Management</CardTitle>
-        <CardDescription>Sign in to your account</CardDescription>
+        <CardTitle className="text-3xl font-[family-name:var(--font-display)] italic tracking-tight">
+          OfficeSpace
+        </CardTitle>
+        <CardDescription className="text-muted-foreground">
+          Sign in to your workspace
+        </CardDescription>
       </CardHeader>
-      <CardContent>
-        <form action={formAction} className="space-y-4">
+      <CardContent className="px-8 pb-8">
+        <form action={formAction} className="space-y-5">
           {state?.error && (
-            <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+            <div className="rounded-lg border-l-4 border-red-500 bg-red-50 p-3 text-sm text-red-700">
               {state.error}
             </div>
           )}
@@ -56,6 +60,7 @@ export function LoginForm() {
               autoComplete="username"
               autoFocus
               placeholder="Enter your username"
+              className="h-11 border-stone-300 focus:ring-teal-500 focus:border-teal-500"
             />
           </div>
           <div className="space-y-2">
@@ -67,9 +72,14 @@ export function LoginForm() {
               required
               autoComplete="current-password"
               placeholder="Enter your password"
+              className="h-11 border-stone-300 focus:ring-teal-500 focus:border-teal-500"
             />
           </div>
-          <Button type="submit" className="w-full" disabled={isPending}>
+          <Button
+            type="submit"
+            className="w-full h-11 rounded-lg bg-teal-600 hover:bg-teal-700 text-white"
+            disabled={isPending}
+          >
             {isPending ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -80,6 +90,9 @@ export function LoginForm() {
             )}
           </Button>
         </form>
+        <p className="mt-6 text-center text-xs text-muted-foreground">
+          Managed by your administrator
+        </p>
       </CardContent>
     </Card>
   );

@@ -15,11 +15,8 @@ export default async function AdminPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <div className="flex items-center gap-2">
-            <Shield className="size-6 text-primary" />
-            <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
-          </div>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="font-[family-name:var(--font-display)] text-3xl tracking-tight text-stone-800">User Management</h1>
+          <p className="text-stone-500 mt-1">
             Manage user accounts, roles, and access.
           </p>
         </div>

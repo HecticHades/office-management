@@ -21,54 +21,81 @@ const TIME_SLOT_LABELS: Record<string, string> = {
   full_day: 'Full Day',
 };
 
+const TIME_SLOT_STYLES: Record<string, string> = {
+  morning: 'bg-teal-50 text-teal-700 border-teal-200',
+  afternoon: 'bg-amber-50 text-amber-700 border-amber-200',
+  full_day: 'bg-stone-100 text-stone-700 border-stone-300',
+};
+
 export function RecentBookings({ bookings }: RecentBookingsProps) {
   return (
-    <Card>
+    <Card className="rounded-xl border-stone-200 shadow-sm">
       <CardHeader>
-        <CardTitle className="text-base">Recent Bookings</CardTitle>
+        <CardTitle className="font-medium">Recent Bookings</CardTitle>
       </CardHeader>
       <CardContent>
         {bookings.length === 0 ? (
-          <p className="text-sm text-muted-foreground py-4 text-center">
-            No recent bookings
-          </p>
+          <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+            <Calendar className="h-10 w-10 mb-3 text-stone-300" />
+            <p className="text-sm">No recent bookings</p>
+          </div>
         ) : (
-          <div className="space-y-3">
-            {bookings.map((booking) => (
-              <div
-                key={booking.id}
-                className="flex items-center justify-between rounded-lg border p-3"
-              >
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <User className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="text-sm font-medium">{booking.userName}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Monitor className="h-3 w-3" />
-                      {booking.deskLabel}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <MapPin className="h-3 w-3" />
-                      {booking.zoneName}
-                    </span>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <Calendar className="h-3 w-3" />
-                    {new Date(booking.date + 'T00:00:00').toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                    })}
-                  </div>
-                  <Badge variant="outline" className="text-xs mt-1">
-                    {TIME_SLOT_LABELS[booking.timeSlot] || booking.timeSlot}
-                  </Badge>
-                </div>
-              </div>
-            ))}
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-stone-200">
+                  <th className="pb-3 text-left font-medium text-muted-foreground">User</th>
+                  <th className="pb-3 text-left font-medium text-muted-foreground">Desk</th>
+                  <th className="pb-3 text-left font-medium text-muted-foreground">Zone</th>
+                  <th className="pb-3 text-left font-medium text-muted-foreground">Date</th>
+                  <th className="pb-3 text-left font-medium text-muted-foreground">Time Slot</th>
+                </tr>
+              </thead>
+              <tbody>
+                {bookings.map((booking, index) => (
+                  <tr
+                    key={booking.id}
+                    className={`border-b border-stone-100 last:border-0 ${
+                      index % 2 === 1 ? 'bg-stone-50/50' : ''
+                    }`}
+                  >
+                    <td className="py-3">
+                      <div className="flex items-center gap-2">
+                        <User className="h-3.5 w-3.5 text-muted-foreground" />
+                        <span className="font-medium">{booking.userName}</span>
+                      </div>
+                    </td>
+                    <td className="py-3">
+                      <div className="flex items-center gap-1.5 text-muted-foreground">
+                        <Monitor className="h-3.5 w-3.5" />
+                        {booking.deskLabel}
+                      </div>
+                    </td>
+                    <td className="py-3">
+                      <div className="flex items-center gap-1.5 text-muted-foreground">
+                        <MapPin className="h-3.5 w-3.5" />
+                        {booking.zoneName}
+                      </div>
+                    </td>
+                    <td className="py-3 text-muted-foreground">
+                      {new Date(booking.date + 'T00:00:00').toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
+                    </td>
+                    <td className="py-3">
+                      <Badge
+                        variant="outline"
+                        className={`text-xs ${TIME_SLOT_STYLES[booking.timeSlot] || ''}`}
+                      >
+                        {TIME_SLOT_LABELS[booking.timeSlot] || booking.timeSlot}
+                      </Badge>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </CardContent>

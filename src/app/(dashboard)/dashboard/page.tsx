@@ -102,6 +102,13 @@ async function getTeamDistributionData() {
   }));
 }
 
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 18) return 'Good afternoon';
+  return 'Good evening';
+}
+
 export default async function DashboardPage() {
   const session = await getSession();
   if (!session) redirect('/login');
@@ -114,11 +121,11 @@ export default async function DashboardPage() {
   ]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <h1 className="text-3xl font-[family-name:var(--font-display)] tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">
-          Welcome back, {session.user.display_name}.
+          {getGreeting()}, {session.user.display_name}.
         </p>
       </div>
 

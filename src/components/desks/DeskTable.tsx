@@ -212,13 +212,13 @@ export function DeskTable({ desks, zones }: DeskTableProps) {
         </Select>
       </div>
 
-      <div className="rounded-md border">
+      <div className="rounded-xl border border-stone-200 overflow-hidden">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="bg-stone-50/80 hover:bg-stone-50/80">
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className="text-stone-600">
                     {header.isPlaceholder
                       ? null
                       : flexRender(header.column.columnDef.header, header.getContext())}
@@ -230,7 +230,7 @@ export function DeskTable({ desks, zones }: DeskTableProps) {
           <TableBody>
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow key={row.id} className="hover:bg-stone-50/50">
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -240,7 +240,7 @@ export function DeskTable({ desks, zones }: DeskTableProps) {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell colSpan={columns.length} className="h-24 text-center text-stone-500">
                   No desks found.
                 </TableCell>
               </TableRow>

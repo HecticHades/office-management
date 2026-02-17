@@ -21,44 +21,44 @@ export default async function SettingsPage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground">
+        <h1 className="font-[family-name:var(--font-display)] text-3xl tracking-tight text-stone-800">Settings</h1>
+        <p className="text-stone-500 mt-1">
           Manage your account and preferences
         </p>
       </div>
 
-      <Card>
+      <Card className="rounded-xl border-stone-200 bg-white shadow-sm">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-stone-800">
+            <User className="h-5 w-5 text-stone-500" />
             Profile Information
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-muted-foreground">Display Name</p>
-              <p className="font-medium">{user.display_name}</p>
+              <p className="text-sm text-stone-400">Display Name</p>
+              <p className="font-medium text-stone-800">{user.display_name}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Username</p>
-              <p className="font-medium">{user.username}</p>
+              <p className="text-sm text-stone-400">Username</p>
+              <p className="font-medium text-stone-800">{user.username}</p>
             </div>
           </div>
-          <Separator />
+          <Separator className="bg-stone-100" />
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-muted-foreground">Role</p>
+              <p className="text-sm text-stone-400">Role</p>
               <div className="flex items-center gap-2 mt-1">
-                <Shield className="h-4 w-4 text-muted-foreground" />
-                <Badge variant="outline">{roleLabels[user.role] || user.role}</Badge>
+                <Shield className="h-4 w-4 text-teal-600" />
+                <Badge variant="outline" className="rounded-full border-teal-200 bg-teal-50 text-teal-700">{roleLabels[user.role] || user.role}</Badge>
               </div>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Last Login</p>
+              <p className="text-sm text-stone-400">Last Login</p>
               <div className="flex items-center gap-2 mt-1">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">
+                <Clock className="h-4 w-4 text-stone-400" />
+                <span className="text-sm text-stone-600">
                   {user.last_login_at
                     ? new Date(user.last_login_at).toLocaleString()
                     : 'Never'}
@@ -66,10 +66,10 @@ export default async function SettingsPage() {
               </div>
             </div>
           </div>
-          <Separator />
+          <Separator className="bg-stone-100" />
           <div>
-            <p className="text-sm text-muted-foreground">Account Created</p>
-            <p className="text-sm mt-1">
+            <p className="text-sm text-stone-400">Account Created</p>
+            <p className="text-sm mt-1 text-stone-600">
               {new Date(user.created_at).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'long',

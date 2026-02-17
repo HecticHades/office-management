@@ -15,11 +15,8 @@ export default async function TeamsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <div className="flex items-center gap-2">
-            <Users className="size-6 text-primary" />
-            <h1 className="text-3xl font-bold tracking-tight">Teams</h1>
-          </div>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="font-[family-name:var(--font-display)] text-3xl tracking-tight text-stone-800">Teams</h1>
+          <p className="text-stone-500 mt-1">
             Manage teams and their members.
           </p>
         </div>
@@ -27,10 +24,12 @@ export default async function TeamsPage() {
       </div>
 
       {teams.length === 0 ? (
-        <div className="rounded-lg border p-12 text-center">
-          <Users className="mx-auto size-12 text-muted-foreground/50" />
-          <h3 className="mt-4 text-lg font-semibold">No teams yet</h3>
-          <p className="mt-1 text-sm text-muted-foreground">
+        <div className="rounded-xl border border-stone-200 bg-white p-12 text-center">
+          <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-stone-100">
+            <Users className="size-8 text-stone-400" />
+          </div>
+          <h3 className="text-lg font-semibold text-stone-700">No teams yet</h3>
+          <p className="mt-1 text-sm text-stone-500">
             {session.user.role === 'admin'
               ? 'Create your first team to get started.'
               : 'No teams have been created yet.'}

@@ -229,10 +229,11 @@ export function DeskForm({ desk, zoneId, trigger }: DeskFormProps) {
               variant="outline"
               onClick={() => setOpen(false)}
               disabled={isPending}
+              className="border-stone-200"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" disabled={isPending} className="bg-teal-600 hover:bg-teal-700 text-white">
               {isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
