@@ -363,8 +363,13 @@ export function FloorPlanView() {
             <>
               {/* SVG layer for zone overlays */}
               <svg
-                className="absolute inset-0 h-full w-full pointer-events-none"
+                className="absolute inset-0 h-full w-full"
                 viewBox="0 0 1200 800"
+                fill="none"
+                style={{
+                  pointerEvents: 'none',
+                  zIndex: isEditMode ? 20 : 'auto',
+                }}
               >
                 {zones.map((zone) => (
                   <ZoneOverlay

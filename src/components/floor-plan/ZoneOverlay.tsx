@@ -68,8 +68,7 @@ export function ZoneOverlay({
   return (
     <g
       data-zone-id={zone.id}
-      onPointerEnter={() => isEditMode && setIsHovered(true)}
-      onPointerLeave={() => setIsHovered(false)}
+      style={{ pointerEvents: isEditMode ? 'auto' : 'none' }}
     >
       <path
         d={zone.boundary_path}
@@ -79,6 +78,8 @@ export function ZoneOverlay({
         strokeOpacity={isHighlighted ? 0.6 : isHovered ? 0.5 : 0.4}
         strokeWidth={isHighlighted ? 3 : isHovered ? 2.5 : 2}
         strokeDasharray="6 3"
+        onPointerEnter={() => isEditMode && setIsHovered(true)}
+        onPointerLeave={() => isEditMode && setIsHovered(false)}
         style={{
           transition: 'fill-opacity 0.25s ease, stroke-opacity 0.25s ease, stroke-width 0.25s ease',
           pointerEvents: isEditMode ? 'all' : 'none',
@@ -104,7 +105,7 @@ export function ZoneOverlay({
           y={bounds.centerY - 16}
           width={104}
           height={32}
-          style={{ pointerEvents: 'all' }}
+          style={{ pointerEvents: 'auto', overflow: 'visible' }}
         >
           <div
             style={{
