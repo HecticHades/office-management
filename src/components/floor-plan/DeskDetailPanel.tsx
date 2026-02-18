@@ -48,6 +48,7 @@ type DeskDetailPanelProps = {
   selectedDate: string;
   selectedSlot: 'morning' | 'afternoon' | 'full_day' | 'any';
   currentUserId: string;
+  canBook: boolean;
   isOpen: boolean;
   onClose: () => void;
   onBook: () => void;
@@ -123,6 +124,7 @@ function DeskDetailPanel({
   selectedDate,
   selectedSlot,
   currentUserId,
+  canBook,
   isOpen,
   onClose,
   onBook,
@@ -293,62 +295,74 @@ function DeskDetailPanel({
               {desk.status !== 'maintenance' && (
                 <>
                   <Separator />
-                  <div>
-                    <h4 className="text-sm font-medium text-stone-700 mb-3">
-                      Quick Book
-                    </h4>
-                    <div className="space-y-3">
-                      <div>
-                        <Label htmlFor="time-slot" className="text-xs text-stone-500">
-                          Time Slot
-                        </Label>
-                        <Select
-                          value={selectedTimeSlot}
-                          onValueChange={(v) => setSelectedTimeSlot(v as TimeSlot)}
+                  {canBook ? (
+                    <div>
+                      <h4 className="text-sm font-medium text-stone-700 mb-3">
+                        Quick Book
+                      </h4>
+                      <div className="space-y-3">
+                        <div>
+                          <Label htmlFor="time-slot" className="text-xs text-stone-500">
+                            Time Slot
+                          </Label>
+                          <Select
+                            value={selectedTimeSlot}
+                            onValueChange={(v) => setSelectedTimeSlot(v as TimeSlot)}
+                          >
+                            <SelectTrigger className="mt-1 w-full">
+                              <SelectValue placeholder="Select time slot" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {SLOTS.map((slot) => (
+                                <SelectItem key={slot} value={slot}>
+                                  {TIME_SLOT_LABELS[slot]}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="notes" className="text-xs text-stone-500">
+                            Notes (optional)
+                          </Label>
+                          <Textarea
+                            id="notes"
+                            value={notes}
+                            onChange={(e) => setNotes(e.target.value)}
+                            placeholder="Any special requirements..."
+                            className="mt-1 resize-none"
+                            rows={2}
+                          />
+                        </div>
+
+                        <Button
+                          onClick={handleBook}
+                          disabled={isBooking || !selectedTimeSlot}
+                          className="w-full bg-teal-600 hover:bg-teal-700 text-white"
                         >
-                          <SelectTrigger className="mt-1 w-full">
-                            <SelectValue placeholder="Select time slot" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {SLOTS.map((slot) => (
-                              <SelectItem key={slot} value={slot}>
-                                {TIME_SLOT_LABELS[slot]}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                          {isBooking ? (
+                            <>
+                              <Loader2 className="mr-2 size-4 animate-spin" />
+                              Booking...
+                            </>
+                          ) : (
+                            'Book Desk'
+                          )}
+                        </Button>
                       </div>
-
-                      <div>
-                        <Label htmlFor="notes" className="text-xs text-stone-500">
-                          Notes (optional)
-                        </Label>
-                        <Textarea
-                          id="notes"
-                          value={notes}
-                          onChange={(e) => setNotes(e.target.value)}
-                          placeholder="Any special requirements..."
-                          className="mt-1 resize-none"
-                          rows={2}
-                        />
-                      </div>
-
-                      <Button
-                        onClick={handleBook}
-                        disabled={isBooking || !selectedTimeSlot}
-                        className="w-full bg-teal-600 hover:bg-teal-700 text-white"
-                      >
-                        {isBooking ? (
-                          <>
-                            <Loader2 className="mr-2 size-4 animate-spin" />
-                            Booking...
-                          </>
-                        ) : (
-                          'Book Desk'
-                        )}
-                      </Button>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+                      <p className="text-sm font-medium text-amber-800">
+                        Restricted Zone
+                      </p>
+                      <p className="text-xs text-amber-600 mt-1">
+                        You are not a member of this zone&apos;s team. Contact your
+                        admin to request access.
+                      </p>
+                    </div>
+                  )}
                 </>
               )}
 

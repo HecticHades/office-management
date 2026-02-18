@@ -22,6 +22,7 @@ type FloorPlanDataZone = {
   name: string;
   color: string;
   boundary_path: string | null;
+  team_id: string | null;
   team_name?: string;
 };
 
@@ -71,6 +72,7 @@ export function FloorPlanView() {
   const [bookings, setBookings] = useState<FloorPlanDataBooking[]>([]);
   const [currentUserId, setCurrentUserId] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
+  const [userTeamIds, setUserTeamIds] = useState<string[]>([]);
 
   // Floor plan image & scale
   const [floorPlanImageUrl, setFloorPlanImageUrl] = useState<string | null>(null);
@@ -93,6 +95,7 @@ export function FloorPlanView() {
     setBookings(result.bookings as FloorPlanDataBooking[]);
     setCurrentUserId(result.currentUserId);
     setIsAdmin(result.isAdmin);
+    setUserTeamIds(result.userTeamIds);
     setIsLoading(false);
   }, []);
 
@@ -244,6 +247,25 @@ export function FloorPlanView() {
     setDrawingZoneId(null);
   }, []);
 
+  const handleZoneOverlayClick = useCallback((zoneId: string) => {
+    if (!isEditMode) return;
+    setIsDrawingZone(true);
+    setDrawingZoneId(zoneId);
+  }, [isEditMode]);
+
+  const handleClearZoneBoundary = useCallback(
+    async (zoneId: string) => {
+      const result = await updateZoneBoundary(zoneId, null);
+      if (result.success) {
+        toast.success('Zone boundary cleared');
+        fetchData(selectedDate);
+      } else {
+        toast.error(result.error || 'Failed to clear zone boundary');
+      }
+    },
+    [selectedDate, fetchData]
+  );
+
   const handleZoomIn = useCallback(() => canvasRef.current?.zoomIn(), []);
   const handleZoomOut = useCallback(() => canvasRef.current?.zoomOut(), []);
   const handleResetZoom = useCallback(() => canvasRef.current?.resetTransform(), []);
@@ -270,6 +292,17 @@ export function FloorPlanView() {
       (b) => b.desk_id === selectedDeskId && b.status === 'confirmed'
     );
   }, [selectedDeskId, bookings]);
+
+  // --- Booking permission for selected desk ---
+  const canBookSelectedDesk = useMemo(() => {
+    if (isAdmin) return true;
+    if (!selectedDeskId) return true;
+    const desk = desks.find((d) => d.id === selectedDeskId);
+    if (!desk) return true;
+    const zone = zones.find((z) => z.id === desk.zone_id);
+    if (!zone || !zone.team_id) return true; // No team assigned = open to all
+    return userTeamIds.includes(zone.team_id);
+  }, [isAdmin, selectedDeskId, desks, zones, userTeamIds]);
 
   // --- Drawing target zone ---
   const drawingTargetZone = useMemo(() => {
@@ -338,6 +371,9 @@ export function FloorPlanView() {
                     key={zone.id}
                     zone={zone}
                     isHighlighted={selectedZoneId === zone.id}
+                    isEditMode={isEditMode}
+                    onEditClick={() => handleZoneOverlayClick(zone.id)}
+                    onClearBoundary={() => handleClearZoneBoundary(zone.id)}
                   />
                 ))}
               </svg>
@@ -382,6 +418,7 @@ export function FloorPlanView() {
         selectedDate={selectedDate}
         selectedSlot={selectedSlot}
         currentUserId={currentUserId}
+        canBook={canBookSelectedDesk}
         isOpen={isPanelOpen}
         onClose={handlePanelClose}
         onBook={handleBook}

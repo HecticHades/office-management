@@ -20,6 +20,7 @@ async function requireAdmin() {
 
 export async function getFloorPlanData(date: string): Promise<{
   zones: (Pick<Zone, 'id' | 'name' | 'color' | 'boundary_path'> & {
+    team_id: string | null;
     team_name?: string;
   })[];
   desks: (Desk & {
@@ -37,15 +38,16 @@ export async function getFloorPlanData(date: string): Promise<{
   }[];
   currentUserId: string;
   isAdmin: boolean;
+  userTeamIds: string[];
   error?: string;
 }> {
   try {
     const session = await requireAuth();
 
-    const [zonesResult, desksResult, bookingsResult] = await Promise.all([
+    const [zonesResult, desksResult, bookingsResult, membershipResult] = await Promise.all([
       db
         .from('zones')
-        .select('id, name, color, boundary_path, teams:team_id(name)'),
+        .select('id, name, color, boundary_path, team_id, teams:team_id(name)'),
       db.from('desks').select('*, zones:zone_id(name, color)'),
       db
         .from('bookings')
@@ -54,11 +56,19 @@ export async function getFloorPlanData(date: string): Promise<{
         )
         .eq('date', date)
         .eq('status', 'confirmed'),
+      db
+        .from('team_members')
+        .select('team_id')
+        .eq('user_id', session.user.id),
     ]);
 
     if (zonesResult.error) throw zonesResult.error;
     if (desksResult.error) throw desksResult.error;
     if (bookingsResult.error) throw bookingsResult.error;
+
+    const userTeamIds = (membershipResult.data || []).map(
+      (m: Record<string, unknown>) => m.team_id as string
+    );
 
     const zones = (zonesResult.data || []).map((z: Record<string, unknown>) => {
       const teamData = z.teams as Record<string, unknown> | null;
@@ -67,6 +77,7 @@ export async function getFloorPlanData(date: string): Promise<{
         name: z.name as string,
         color: z.color as string,
         boundary_path: z.boundary_path as string | null,
+        team_id: (z.team_id as string | null) ?? null,
         team_name: (teamData?.name as string) || undefined,
       };
     });
@@ -101,6 +112,7 @@ export async function getFloorPlanData(date: string): Promise<{
       bookings,
       currentUserId: session.user.id,
       isAdmin: session.user.role === 'admin',
+      userTeamIds,
     };
   } catch (e) {
     return {
@@ -109,6 +121,7 @@ export async function getFloorPlanData(date: string): Promise<{
       bookings: [],
       currentUserId: '',
       isAdmin: false,
+      userTeamIds: [],
       error: (e as Error).message,
     };
   }
