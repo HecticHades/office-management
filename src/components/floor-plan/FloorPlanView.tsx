@@ -135,10 +135,6 @@ export function FloorPlanView() {
         map.set(desk.id, { status: 'maintenance' });
         continue;
       }
-      if (desk.status === 'reserved') {
-        map.set(desk.id, { status: 'reserved' });
-        continue;
-      }
 
       const deskBookings = bookings.filter(
         (b) => b.desk_id === desk.id && b.status === 'confirmed'

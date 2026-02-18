@@ -4,9 +4,8 @@ import { cn } from '@/lib/utils';
 
 const LEGEND_ITEMS = [
   { color: 'bg-emerald-500', label: 'Available' },
-  { color: 'bg-sky-500', label: 'My Booking' },
-  { color: 'bg-stone-400', label: 'Occupied' },
-  { color: 'bg-amber-500', label: 'Reserved' },
+  { color: 'bg-blue-600', label: 'My Booking' },
+  { color: 'bg-stone-500', label: 'Occupied' },
   { color: 'bg-rose-500', label: 'Maintenance' },
 ] as const;
 

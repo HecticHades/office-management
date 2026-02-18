@@ -5,7 +5,7 @@ import { Monitor, ArrowUpFromLine, Lock, Users, GripVertical, RotateCw } from 'l
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
-export type DeskDisplayStatus = 'available' | 'mine' | 'occupied' | 'reserved' | 'maintenance';
+export type DeskDisplayStatus = 'available' | 'mine' | 'occupied' | 'maintenance';
 
 type DeskNodeProps = {
   desk: {
@@ -31,11 +31,10 @@ type DeskNodeProps = {
 };
 
 const statusStyles: Record<DeskDisplayStatus, { band: string; border: string; bg: string }> = {
-  available:   { band: 'bg-emerald-500', border: 'border-emerald-500/40', bg: 'bg-emerald-50' },
-  mine:        { band: 'bg-sky-500',     border: 'border-sky-500/40',     bg: 'bg-sky-50' },
-  occupied:    { band: 'bg-stone-400',   border: 'border-stone-400/40',   bg: 'bg-stone-50' },
-  reserved:    { band: 'bg-amber-500',   border: 'border-amber-500/40',   bg: 'bg-amber-50' },
-  maintenance: { band: 'bg-rose-500',    border: 'border-rose-500/40',    bg: 'bg-rose-50' },
+  available:   { band: 'bg-emerald-500', border: 'border-emerald-300',    bg: 'bg-emerald-50' },
+  mine:        { band: 'bg-blue-600',    border: 'border-blue-400',       bg: 'bg-blue-100' },
+  occupied:    { band: 'bg-stone-500',   border: 'border-stone-300',      bg: 'bg-stone-200' },
+  maintenance: { band: 'bg-rose-500',    border: 'border-rose-300',       bg: 'bg-rose-50' },
 };
 
 const deskTypeIcons: Record<string, typeof Monitor> = {
