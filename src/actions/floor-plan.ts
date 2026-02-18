@@ -20,6 +20,7 @@ async function requireAdmin() {
 
 export async function getFloorPlanData(date: string): Promise<{
   zones: (Pick<Zone, 'id' | 'name' | 'color' | 'boundary_path'> & {
+    floor: number;
     team_ids: string[];
     team_names: string[];
   })[];
@@ -47,7 +48,7 @@ export async function getFloorPlanData(date: string): Promise<{
     const [zonesResult, desksResult, bookingsResult, membershipResult] = await Promise.all([
       db
         .from('zones')
-        .select('id, name, color, boundary_path, zone_teams(team_id, teams:team_id(name))'),
+        .select('id, name, color, floor, boundary_path, zone_teams(team_id, teams:team_id(name))'),
       db.from('desks').select('*, zones:zone_id(name, color)'),
       db
         .from('bookings')
@@ -76,6 +77,7 @@ export async function getFloorPlanData(date: string): Promise<{
         id: z.id as string,
         name: z.name as string,
         color: z.color as string,
+        floor: (z.floor as number) ?? 1,
         boundary_path: z.boundary_path as string | null,
         team_ids: zoneTeamRows.map((zt) => zt.team_id),
         team_names: zoneTeamRows

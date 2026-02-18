@@ -3,7 +3,6 @@
 import React, { useState, useRef } from 'react';
 import { ImageIcon, Trash2, Loader2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
-import { updateFloorPlanConfig } from '@/actions/floor-plan-config';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,12 +18,14 @@ import {
 type FloorPlanImageUploadProps = {
   currentImageUrl: string | null;
   onSave: (imageUrl: string | null) => void;
+  floor: number;
   trigger: React.ReactNode;
 };
 
 function FloorPlanImageUpload({
   currentImageUrl,
   onSave,
+  floor,
   trigger,
 }: FloorPlanImageUploadProps) {
   const [open, setOpen] = useState(false);
@@ -114,14 +115,6 @@ function FloorPlanImageUpload({
     setSaving(true);
     try {
       const urlToSave = imageUrl.trim() || null;
-      const result = await updateFloorPlanConfig({ image_url: urlToSave });
-
-      if (!result.success) {
-        toast.error(result.error ?? 'Failed to update workspace image');
-        return;
-      }
-
-      toast.success('Workspace image updated');
       onSave(urlToSave);
       setOpen(false);
     } catch {
@@ -140,7 +133,7 @@ function FloorPlanImageUpload({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-stone-800">
             <ImageIcon className="size-5 text-teal-600" />
-            Workspace Image
+            Floor {floor} Workspace Image
           </DialogTitle>
         </DialogHeader>
 

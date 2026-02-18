@@ -46,12 +46,17 @@ type FloorPlanToolbarProps = {
   onZoomIn: () => void;
   onZoomOut: () => void;
   onResetZoom: () => void;
+  // Floor switcher
+  floors: number[];
+  selectedFloor: number;
+  onFloorChange: (floor: number) => void;
   zones: { id: string; name: string; color: string }[];
   selectedZoneId: string | null;
   onZoneFilter: (zoneId: string | null) => void;
   // Floor plan image
   imageUrl: string | null;
   onImageSaved: (url: string | null) => void;
+  selectedFloorForUpload: number;
   // Zone drawing
   isDrawingZone: boolean;
   onDrawZoneToggle: () => void;
@@ -78,11 +83,15 @@ function FloorPlanToolbar({
   onZoomIn,
   onZoomOut,
   onResetZoom,
+  floors,
+  selectedFloor,
+  onFloorChange,
   zones,
   selectedZoneId,
   onZoneFilter,
   imageUrl,
   onImageSaved,
+  selectedFloorForUpload,
   isDrawingZone,
   onDrawZoneToggle,
   drawingZoneId,
@@ -112,6 +121,30 @@ function FloorPlanToolbar({
           />
         </PopoverContent>
       </Popover>
+
+      {/* Floor switcher */}
+      {floors.length > 1 && (
+        <>
+          <Separator orientation="vertical" className="hidden h-6 sm:block" />
+          <div className="flex items-center gap-1 rounded-lg border border-stone-200 p-0.5">
+            {floors.map((floor) => (
+              <Button
+                key={floor}
+                variant={selectedFloor === floor ? 'default' : 'ghost'}
+                size="xs"
+                className={cn(
+                  selectedFloor === floor
+                    ? 'bg-teal-600 text-white hover:bg-teal-700'
+                    : 'text-stone-500 hover:text-stone-800',
+                )}
+                onClick={() => onFloorChange(floor)}
+              >
+                Floor {floor}
+              </Button>
+            ))}
+          </div>
+        </>
+      )}
 
       <Separator orientation="vertical" className="hidden h-6 sm:block" />
 
@@ -218,6 +251,7 @@ function FloorPlanToolbar({
               <FloorPlanImageUpload
                 currentImageUrl={imageUrl}
                 onSave={onImageSaved}
+                floor={selectedFloorForUpload}
                 trigger={
                   <Button variant="outline" size="sm" className="gap-2">
                     <ImageIcon className="size-4 text-stone-500" />

@@ -13,7 +13,7 @@ import { ZoneOverlay } from './ZoneOverlay';
 import { DeskDetailPanel } from './DeskDetailPanel';
 import { ZoneDrawingLayer } from './ZoneDrawingLayer';
 import { getFloorPlanData, updateDeskPosition } from '@/actions/floor-plan';
-import { getFloorPlanConfig, updateZoneBoundary } from '@/actions/floor-plan-config';
+import { getFloorPlanConfig, updateFloorPlanImage, updateZoneBoundary } from '@/actions/floor-plan-config';
 import { useRealtimeBookings } from '@/lib/hooks/use-realtime-bookings';
 import type { Desk, TimeSlot } from '@/lib/db/types';
 
@@ -21,6 +21,7 @@ type FloorPlanDataZone = {
   id: string;
   name: string;
   color: string;
+  floor: number;
   boundary_path: string | null;
   team_ids: string[];
   team_names: string[];
@@ -74,8 +75,9 @@ export function FloorPlanView() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [userTeamIds, setUserTeamIds] = useState<string[]>([]);
 
-  // Floor plan image & scale
-  const [floorPlanImageUrl, setFloorPlanImageUrl] = useState<string | null>(null);
+  // Floor selection & per-floor images
+  const [selectedFloor, setSelectedFloor] = useState(1);
+  const [floorImages, setFloorImages] = useState<Record<string, string>>({});
   const [currentScale, setCurrentScale] = useState(0.8);
 
   // Zone drawing mode
@@ -103,7 +105,7 @@ export function FloorPlanView() {
   useEffect(() => {
     getFloorPlanConfig().then((cfg) => {
       if (!cfg.error) {
-        setFloorPlanImageUrl(cfg.image_url);
+        setFloorImages(cfg.floor_images);
       }
     });
   }, []);
@@ -120,11 +122,28 @@ export function FloorPlanView() {
 
   useRealtimeBookings(selectedDate, handleRealtimeUpdate);
 
-  // --- Zone filtering ---
+  // --- Floor & zone filtering ---
+  const availableFloors = useMemo(() => {
+    const floors = [...new Set(zones.map((z) => z.floor))].sort((a, b) => a - b);
+    return floors.length > 0 ? floors : [1];
+  }, [zones]);
+
+  const floorZones = useMemo(
+    () => zones.filter((z) => z.floor === selectedFloor),
+    [zones, selectedFloor]
+  );
+
+  const floorDesks = useMemo(
+    () => desks.filter((d) => floorZones.some((z) => z.id === d.zone_id)),
+    [desks, floorZones]
+  );
+
   const filteredDesks = useMemo(() => {
-    if (!selectedZoneId) return desks;
-    return desks.filter((d) => d.zone_id === selectedZoneId);
-  }, [desks, selectedZoneId]);
+    if (!selectedZoneId) return floorDesks;
+    return floorDesks.filter((d) => d.zone_id === selectedZoneId);
+  }, [floorDesks, selectedZoneId]);
+
+  const floorPlanImageUrl = floorImages[String(selectedFloor)] ?? null;
 
   // --- Desk display status computation ---
   const deskStatuses = useMemo(() => {
@@ -210,9 +229,25 @@ export function FloorPlanView() {
     setCurrentScale(scale);
   }, []);
 
-  const handleImageSaved = useCallback((url: string | null) => {
-    setFloorPlanImageUrl(url);
-  }, []);
+  const handleImageSaved = useCallback(
+    async (url: string | null) => {
+      const result = await updateFloorPlanImage(selectedFloor, url);
+      if (result.success) {
+        setFloorImages((prev) => {
+          const next = { ...prev };
+          if (url) {
+            next[String(selectedFloor)] = url;
+          } else {
+            delete next[String(selectedFloor)];
+          }
+          return next;
+        });
+      } else {
+        toast.error(result.error || 'Failed to save floor image');
+      }
+    },
+    [selectedFloor]
+  );
 
   const handleDrawZoneToggle = useCallback(() => {
     setIsDrawingZone((prev) => {
@@ -331,11 +366,15 @@ export function FloorPlanView() {
           onZoomIn={handleZoomIn}
           onZoomOut={handleZoomOut}
           onResetZoom={handleResetZoom}
-          zones={zones}
+          floors={availableFloors}
+          selectedFloor={selectedFloor}
+          onFloorChange={setSelectedFloor}
+          zones={floorZones}
           selectedZoneId={selectedZoneId}
           onZoneFilter={setSelectedZoneId}
           imageUrl={floorPlanImageUrl}
           onImageSaved={handleImageSaved}
+          selectedFloorForUpload={selectedFloor}
           isDrawingZone={isDrawingZone}
           onDrawZoneToggle={handleDrawZoneToggle}
           drawingZoneId={drawingZoneId}
@@ -348,11 +387,11 @@ export function FloorPlanView() {
           onZoomChange={handleZoomChange}
           backgroundImageUrl={floorPlanImageUrl}
         >
-          {desks.length === 0 ? (
+          {floorDesks.length === 0 ? (
             <div className="absolute inset-0 flex items-center justify-center">
               <p className="max-w-sm text-center text-sm text-stone-400">
-                No desks have been placed yet. Create desks in the Spaces section,
-                then position them here.
+                No desks on this floor yet. Create desks in the Spaces section
+                and assign them to a zone on this floor.
               </p>
             </div>
           ) : (
@@ -367,7 +406,7 @@ export function FloorPlanView() {
                   zIndex: isEditMode ? 20 : 'auto',
                 }}
               >
-                {zones.map((zone) => (
+                {floorZones.map((zone) => (
                   <ZoneOverlay
                     key={zone.id}
                     zone={zone}

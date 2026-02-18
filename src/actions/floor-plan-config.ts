@@ -19,12 +19,14 @@ async function requireAdmin() {
 
 const FLOOR_PLAN_DEFAULTS = {
   image_url: null as string | null,
+  floor_images: {} as Record<string, string>,
   canvas_width: 1200,
   canvas_height: 800,
 };
 
 export async function getFloorPlanConfig(): Promise<{
   image_url: string | null;
+  floor_images: Record<string, string>;
   canvas_width: number;
   canvas_height: number;
   error?: string;
@@ -43,8 +45,20 @@ export async function getFloorPlanConfig(): Promise<{
     }
 
     const value = data.value as Record<string, unknown>;
+    const imageUrl = (value.image_url as string | null) ?? null;
+    const storedFloorImages = (value.floor_images as Record<string, string> | undefined) ?? {};
+
+    // Backward compat: if floor_images is empty but image_url exists, treat it as floor 1
+    const floorImages =
+      Object.keys(storedFloorImages).length > 0
+        ? storedFloorImages
+        : imageUrl
+          ? { '1': imageUrl }
+          : {};
+
     return {
-      image_url: (value.image_url as string | null) ?? null,
+      image_url: imageUrl,
+      floor_images: floorImages,
       canvas_width: (value.canvas_width as number) ?? 1200,
       canvas_height: (value.canvas_height as number) ?? 800,
     };
@@ -76,6 +90,53 @@ export async function updateFloorPlanConfig(config: {
     };
 
     const mergedValue = { ...currentValue, ...config };
+
+    const { error } = await db
+      .from('app_settings')
+      .upsert(
+        {
+          key: 'floor_plan',
+          value: mergedValue,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'key' }
+      );
+
+    if (error) throw error;
+
+    revalidatePath('/floor-plan');
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: (e as Error).message };
+  }
+}
+
+export async function updateFloorPlanImage(
+  floor: number,
+  url: string | null
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    await requireAdmin();
+
+    const { data: existing } = await db
+      .from('app_settings')
+      .select('value')
+      .eq('key', 'floor_plan')
+      .single();
+
+    const currentValue = (existing?.value as Record<string, unknown>) ?? {
+      ...FLOOR_PLAN_DEFAULTS,
+    };
+
+    const floorImages = (currentValue.floor_images as Record<string, string> | undefined) ?? {};
+
+    if (url) {
+      floorImages[String(floor)] = url;
+    } else {
+      delete floorImages[String(floor)];
+    }
+
+    const mergedValue = { ...currentValue, floor_images: floorImages };
 
     const { error } = await db
       .from('app_settings')
