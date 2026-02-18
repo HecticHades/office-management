@@ -50,7 +50,19 @@ export default async function ZoneDetailPage({
         {isAdmin && (
           <div className="flex items-center gap-2">
             <ZoneForm
-              zone={zone}
+              zone={{
+                id: zone.id,
+                name: zone.name,
+                description: zone.description,
+                floor: zone.floor,
+                capacity: zone.capacity,
+                color: zone.color,
+                team_id: zone.team_id,
+                boundary_path: zone.boundary_path,
+                created_at: zone.created_at,
+                updated_at: zone.updated_at,
+                teams: zone.teams,
+              }}
               trigger={
                 <Button variant="outline" size="sm">
                   <Edit className="h-4 w-4 mr-2" />

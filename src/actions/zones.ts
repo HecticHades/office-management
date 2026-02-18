@@ -98,13 +98,13 @@ export async function getZone(zoneId: string): Promise<{
       .map((zt) => zt.teams)
       .filter((t): t is Pick<Team, 'id' | 'name' | 'color'> => t !== null);
 
+    const { zone_teams: _zt, ...zoneData } = zone;
     return {
       zone: {
-        ...zone,
-        zone_teams: undefined,
+        ...zoneData,
         teams,
         desks: desks || [],
-      } as Zone & { teams: Pick<Team, 'id' | 'name' | 'color'>[]; desks: Desk[] },
+      } as unknown as Zone & { teams: Pick<Team, 'id' | 'name' | 'color'>[]; desks: Desk[] },
     };
   } catch (e) {
     return { error: (e as Error).message };
