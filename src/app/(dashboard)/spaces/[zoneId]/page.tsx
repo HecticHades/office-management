@@ -88,12 +88,21 @@ export default async function ZoneDetailPage({
         </Card>
         <Card className="rounded-xl border-stone-200 bg-white shadow-sm">
           <CardContent className="flex items-center gap-3 p-4">
-            <div
-              className="h-5 w-5 rounded-full"
-              style={{ backgroundColor: zone.team?.color || '#94a3b8' }}
-            />
+            <div className="flex size-10 items-center justify-center rounded-lg bg-sky-50">
+              <Users className="h-5 w-5 text-sky-600" />
+            </div>
             <div>
-              <p className="text-sm font-medium text-stone-800">{zone.team?.name || 'Open Zone'}</p>
+              {zone.teams.length > 0 ? (
+                <div className="flex flex-wrap gap-1">
+                  {zone.teams.map((t) => (
+                    <span key={t.id} className="text-sm font-medium text-stone-800">
+                      {t.name}{zone.teams.indexOf(t) < zone.teams.length - 1 ? ',' : ''}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm font-medium text-stone-800">Open Zone</p>
+              )}
               <p className="text-sm text-stone-500">Team Assignment</p>
             </div>
           </CardContent>

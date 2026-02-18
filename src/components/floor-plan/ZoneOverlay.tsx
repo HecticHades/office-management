@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
 
 type ZoneOverlayProps = {
@@ -16,9 +16,6 @@ type ZoneOverlayProps = {
   onClearBoundary?: () => void;
 };
 
-/**
- * Extracts the center and top-left of the bounding box from an SVG path.
- */
 function parseBounds(path: string): {
   labelX: number;
   labelY: number;
@@ -59,6 +56,24 @@ export function ZoneOverlay({
   onClearBoundary,
 }: ZoneOverlayProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const hideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleEnter = useCallback(() => {
+    if (!isEditMode) return;
+    if (hideTimeout.current) {
+      clearTimeout(hideTimeout.current);
+      hideTimeout.current = null;
+    }
+    setIsHovered(true);
+  }, [isEditMode]);
+
+  const handleLeave = useCallback(() => {
+    if (!isEditMode) return;
+    // Small delay so the mouse can travel from the path to the buttons
+    hideTimeout.current = setTimeout(() => {
+      setIsHovered(false);
+    }, 200);
+  }, [isEditMode]);
 
   if (!zone.boundary_path) return null;
 
@@ -78,8 +93,8 @@ export function ZoneOverlay({
         strokeOpacity={isHighlighted ? 0.6 : isHovered ? 0.5 : 0.4}
         strokeWidth={isHighlighted ? 3 : isHovered ? 2.5 : 2}
         strokeDasharray="6 3"
-        onPointerEnter={() => isEditMode && setIsHovered(true)}
-        onPointerLeave={() => isEditMode && setIsHovered(false)}
+        onPointerEnter={handleEnter}
+        onPointerLeave={handleLeave}
         style={{
           transition: 'fill-opacity 0.25s ease, stroke-opacity 0.25s ease, stroke-width 0.25s ease',
           pointerEvents: isEditMode ? 'all' : 'none',
@@ -108,6 +123,8 @@ export function ZoneOverlay({
           style={{ pointerEvents: 'auto', overflow: 'visible' }}
         >
           <div
+            onPointerEnter={handleEnter}
+            onPointerLeave={handleLeave}
             style={{
               display: 'flex',
               gap: '4px',

@@ -19,7 +19,7 @@ async function requireAdmin() {
 }
 
 export async function getZones(): Promise<{
-  zones: (Zone & { team?: Pick<Team, 'id' | 'name' | 'color'>; deskCount: number })[];
+  zones: (Zone & { teams: Pick<Team, 'id' | 'name' | 'color'>[]; deskCount: number })[];
   error?: string;
 }> {
   try {
@@ -27,7 +27,7 @@ export async function getZones(): Promise<{
 
     const { data: zones, error } = await db
       .from('zones')
-      .select('*, teams:team_id(id, name, color)')
+      .select('*, zone_teams(team_id, teams:team_id(id, name, color))')
       .order('floor', { ascending: true })
       .order('name', { ascending: true });
 
@@ -50,20 +50,28 @@ export async function getZones(): Promise<{
       }
     }
 
-    const result = (zones || []).map((z: Record<string, unknown>) => ({
-      ...z,
-      team: z.teams || undefined,
-      deskCount: deskCounts[z.id as string] || 0,
-    }));
+    const result = (zones || []).map((z: Record<string, unknown>) => {
+      const zoneTeamRows = (z.zone_teams as { teams: Pick<Team, 'id' | 'name' | 'color'> | null }[]) || [];
+      const teams = zoneTeamRows
+        .map((zt) => zt.teams)
+        .filter((t): t is Pick<Team, 'id' | 'name' | 'color'> => t !== null);
 
-    return { zones: result as (Zone & { team?: Pick<Team, 'id' | 'name' | 'color'>; deskCount: number })[] };
+      const { zone_teams: _zt, ...rest } = z as Record<string, unknown>;
+      return {
+        ...rest,
+        teams,
+        deskCount: deskCounts[z.id as string] || 0,
+      };
+    });
+
+    return { zones: result as unknown as (Zone & { teams: Pick<Team, 'id' | 'name' | 'color'>[]; deskCount: number })[] };
   } catch (e) {
     return { zones: [], error: (e as Error).message };
   }
 }
 
 export async function getZone(zoneId: string): Promise<{
-  zone?: Zone & { team?: Pick<Team, 'id' | 'name' | 'color'>; desks: Desk[] };
+  zone?: Zone & { teams: Pick<Team, 'id' | 'name' | 'color'>[]; desks: Desk[] };
   error?: string;
 }> {
   try {
@@ -71,7 +79,7 @@ export async function getZone(zoneId: string): Promise<{
 
     const { data: zone, error } = await db
       .from('zones')
-      .select('*, teams:team_id(id, name, color)')
+      .select('*, zone_teams(team_id, teams:team_id(id, name, color))')
       .eq('id', zoneId)
       .single();
 
@@ -85,12 +93,18 @@ export async function getZone(zoneId: string): Promise<{
 
     if (desksError) throw desksError;
 
+    const zoneTeamRows = (zone.zone_teams as { teams: Pick<Team, 'id' | 'name' | 'color'> | null }[]) || [];
+    const teams = zoneTeamRows
+      .map((zt) => zt.teams)
+      .filter((t): t is Pick<Team, 'id' | 'name' | 'color'> => t !== null);
+
     return {
       zone: {
         ...zone,
-        team: zone.teams || undefined,
+        zone_teams: undefined,
+        teams,
         desks: desks || [],
-      } as Zone & { team?: Pick<Team, 'id' | 'name' | 'color'>; desks: Desk[] },
+      } as Zone & { teams: Pick<Team, 'id' | 'name' | 'color'>[]; desks: Desk[] },
     };
   } catch (e) {
     return { error: (e as Error).message };
@@ -108,8 +122,8 @@ export async function createZone(formData: FormData): Promise<{
     const name = formData.get('name') as string;
     const description = (formData.get('description') as string) || null;
     const floor = parseInt(formData.get('floor') as string, 10);
-    const teamIdRaw = formData.get('team_id') as string;
-    const teamId = teamIdRaw && teamIdRaw !== 'none' ? teamIdRaw : null;
+    const teamIdsRaw = formData.get('team_ids') as string;
+    const teamIds = teamIdsRaw ? teamIdsRaw.split(',').filter(Boolean) : [];
     const capacity = parseInt(formData.get('capacity') as string, 10);
     const color = (formData.get('color') as string) || '#3b82f6';
 
@@ -123,7 +137,7 @@ export async function createZone(formData: FormData): Promise<{
         name,
         description,
         floor,
-        team_id: teamId || null,
+        team_id: teamIds[0] || null, // Keep legacy column in sync
         capacity,
         color,
       })
@@ -131,6 +145,14 @@ export async function createZone(formData: FormData): Promise<{
       .single();
 
     if (error) throw error;
+
+    // Insert zone_teams rows
+    if (teamIds.length > 0) {
+      const { error: ztError } = await db
+        .from('zone_teams')
+        .insert(teamIds.map((tid) => ({ zone_id: zone.id, team_id: tid })));
+      if (ztError) throw ztError;
+    }
 
     revalidatePath('/spaces');
     return { success: true, zone };
@@ -149,8 +171,8 @@ export async function updateZone(zoneId: string, formData: FormData): Promise<{
     const name = formData.get('name') as string;
     const description = (formData.get('description') as string) || null;
     const floor = parseInt(formData.get('floor') as string, 10);
-    const teamIdRaw = formData.get('team_id') as string;
-    const teamId = teamIdRaw && teamIdRaw !== 'none' ? teamIdRaw : null;
+    const teamIdsRaw = formData.get('team_ids') as string;
+    const teamIds = teamIdsRaw ? teamIdsRaw.split(',').filter(Boolean) : [];
     const capacity = parseInt(formData.get('capacity') as string, 10);
     const color = (formData.get('color') as string) || '#3b82f6';
 
@@ -164,13 +186,22 @@ export async function updateZone(zoneId: string, formData: FormData): Promise<{
         name,
         description,
         floor,
-        team_id: teamId || null,
+        team_id: teamIds[0] || null, // Keep legacy column in sync
         capacity,
         color,
       })
       .eq('id', zoneId);
 
     if (error) throw error;
+
+    // Replace zone_teams: delete old, insert new
+    await db.from('zone_teams').delete().eq('zone_id', zoneId);
+    if (teamIds.length > 0) {
+      const { error: ztError } = await db
+        .from('zone_teams')
+        .insert(teamIds.map((tid) => ({ zone_id: zoneId, team_id: tid })));
+      if (ztError) throw ztError;
+    }
 
     revalidatePath('/spaces');
     revalidatePath(`/spaces/${zoneId}`);

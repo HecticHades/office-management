@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -13,19 +15,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Loader2 } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Zone, Team } from '@/lib/db/types';
 
 type ZoneFormProps = {
-  zone?: Zone & { team?: Pick<Team, 'id' | 'name' | 'color'> };
+  zone?: Zone & { teams: Pick<Team, 'id' | 'name' | 'color'>[] };
   trigger: React.ReactNode;
 };
 
@@ -39,11 +34,13 @@ const ZONE_COLORS = [
 export function ZoneForm({ zone, trigger }: ZoneFormProps) {
   const [open, setOpen] = useState(false);
   const [teams, setTeams] = useState<Pick<Team, 'id' | 'name' | 'color'>[]>([]);
-  const [selectedTeam, setSelectedTeam] = useState(zone?.team_id || 'none');
+  const [selectedTeamIds, setSelectedTeamIds] = useState<string[]>(
+    zone?.teams?.map((t) => t.id) || []
+  );
   const [selectedColor, setSelectedColor] = useState(zone?.color || '#3b82f6');
 
   async function formAction(_prev: FormState, formData: FormData): Promise<FormState> {
-    formData.set('team_id', selectedTeam);
+    formData.set('team_ids', selectedTeamIds.join(','));
     formData.set('color', selectedColor);
 
     if (zone) {
@@ -57,8 +54,10 @@ export function ZoneForm({ zone, trigger }: ZoneFormProps) {
   useEffect(() => {
     if (open) {
       getTeamsForSelect().then(({ teams: t }) => setTeams(t));
+      setSelectedTeamIds(zone?.teams?.map((t) => t.id) || []);
+      setSelectedColor(zone?.color || '#3b82f6');
     }
-  }, [open]);
+  }, [open, zone]);
 
   useEffect(() => {
     if (state?.success) {
@@ -68,6 +67,14 @@ export function ZoneForm({ zone, trigger }: ZoneFormProps) {
       toast.error(state.error);
     }
   }, [state, zone]);
+
+  function toggleTeam(teamId: string) {
+    setSelectedTeamIds((prev) =>
+      prev.includes(teamId)
+        ? prev.filter((id) => id !== teamId)
+        : [...prev, teamId]
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -121,28 +128,66 @@ export function ZoneForm({ zone, trigger }: ZoneFormProps) {
               />
             </div>
           </div>
+
+          {/* Multi-team assignment */}
           <div className="space-y-2">
             <Label>Team Assignment</Label>
-            <Select value={selectedTeam} onValueChange={setSelectedTeam}>
-              <SelectTrigger>
-                <SelectValue placeholder="No team (open zone)" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">No team (open zone)</SelectItem>
-                {teams.map((team) => (
-                  <SelectItem key={team.id} value={team.id}>
-                    <span className="flex items-center gap-2">
-                      <span
-                        className="inline-block h-2.5 w-2.5 rounded-full"
-                        style={{ backgroundColor: team.color }}
-                      />
+            {selectedTeamIds.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {selectedTeamIds.map((tid) => {
+                  const team = teams.find((t) => t.id === tid);
+                  if (!team) return null;
+                  return (
+                    <Badge
+                      key={tid}
+                      variant="secondary"
+                      className="text-xs rounded-full gap-1 pr-1"
+                      style={{
+                        backgroundColor: `${team.color}15`,
+                        color: team.color,
+                        borderColor: `${team.color}30`,
+                      }}
+                    >
                       {team.name}
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                      <button
+                        type="button"
+                        onClick={() => toggleTeam(tid)}
+                        className="ml-0.5 rounded-full p-0.5 hover:bg-black/10"
+                      >
+                        <X className="size-3" />
+                      </button>
+                    </Badge>
+                  );
+                })}
+              </div>
+            )}
+            <div className="max-h-[140px] overflow-y-auto rounded-lg border border-stone-200 divide-y divide-stone-100">
+              {teams.length === 0 ? (
+                <p className="text-xs text-stone-400 p-3 text-center">No teams available</p>
+              ) : (
+                teams.map((team) => (
+                  <label
+                    key={team.id}
+                    className="flex items-center gap-3 px-3 py-2 hover:bg-stone-50 cursor-pointer"
+                  >
+                    <Checkbox
+                      checked={selectedTeamIds.includes(team.id)}
+                      onCheckedChange={() => toggleTeam(team.id)}
+                    />
+                    <span
+                      className="inline-block h-2.5 w-2.5 rounded-full shrink-0"
+                      style={{ backgroundColor: team.color }}
+                    />
+                    <span className="text-sm text-stone-700">{team.name}</span>
+                  </label>
+                ))
+              )}
+            </div>
+            <p className="text-xs text-stone-400">
+              Leave empty for an open zone (any user can book).
+            </p>
           </div>
+
           <div className="space-y-2">
             <Label>Color</Label>
             <div className="flex flex-wrap gap-2">

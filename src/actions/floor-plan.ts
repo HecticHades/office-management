@@ -20,8 +20,8 @@ async function requireAdmin() {
 
 export async function getFloorPlanData(date: string): Promise<{
   zones: (Pick<Zone, 'id' | 'name' | 'color' | 'boundary_path'> & {
-    team_id: string | null;
-    team_name?: string;
+    team_ids: string[];
+    team_names: string[];
   })[];
   desks: (Desk & {
     zone_name: string;
@@ -47,7 +47,7 @@ export async function getFloorPlanData(date: string): Promise<{
     const [zonesResult, desksResult, bookingsResult, membershipResult] = await Promise.all([
       db
         .from('zones')
-        .select('id, name, color, boundary_path, team_id, teams:team_id(name)'),
+        .select('id, name, color, boundary_path, zone_teams(team_id, teams:team_id(name))'),
       db.from('desks').select('*, zones:zone_id(name, color)'),
       db
         .from('bookings')
@@ -71,14 +71,16 @@ export async function getFloorPlanData(date: string): Promise<{
     );
 
     const zones = (zonesResult.data || []).map((z: Record<string, unknown>) => {
-      const teamData = z.teams as Record<string, unknown> | null;
+      const zoneTeamRows = (z.zone_teams as { team_id: string; teams: { name: string } | null }[]) || [];
       return {
         id: z.id as string,
         name: z.name as string,
         color: z.color as string,
         boundary_path: z.boundary_path as string | null,
-        team_id: (z.team_id as string | null) ?? null,
-        team_name: (teamData?.name as string) || undefined,
+        team_ids: zoneTeamRows.map((zt) => zt.team_id),
+        team_names: zoneTeamRows
+          .map((zt) => zt.teams?.name)
+          .filter((n): n is string => !!n),
       };
     });
 

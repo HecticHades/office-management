@@ -22,8 +22,8 @@ type FloorPlanDataZone = {
   name: string;
   color: string;
   boundary_path: string | null;
-  team_id: string | null;
-  team_name?: string;
+  team_ids: string[];
+  team_names: string[];
 };
 
 type FloorPlanDataDesk = Desk & {
@@ -296,8 +296,8 @@ export function FloorPlanView() {
     const desk = desks.find((d) => d.id === selectedDeskId);
     if (!desk) return true;
     const zone = zones.find((z) => z.id === desk.zone_id);
-    if (!zone || !zone.team_id) return true; // No team assigned = open to all
-    return userTeamIds.includes(zone.team_id);
+    if (!zone || zone.team_ids.length === 0) return true; // No teams assigned = open to all
+    return zone.team_ids.some((tid) => userTeamIds.includes(tid));
   }, [isAdmin, selectedDeskId, desks, zones, userTeamIds]);
 
   // --- Drawing target zone ---

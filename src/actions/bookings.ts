@@ -46,21 +46,21 @@ export async function bookDesk(formData: FormData): Promise<{
 
     // Check team access (admin bypasses)
     if (session.user.role !== 'admin') {
-      const { data: zone } = await db
-        .from('zones')
+      const { data: zoneTeams } = await db
+        .from('zone_teams')
         .select('team_id')
-        .eq('id', desk.zone_id)
-        .single();
+        .eq('zone_id', desk.zone_id);
 
-      if (zone?.team_id) {
-        const { data: membership } = await db
+      if (zoneTeams && zoneTeams.length > 0) {
+        const zoneTeamIds = zoneTeams.map((zt: { team_id: string }) => zt.team_id);
+
+        const { data: memberships } = await db
           .from('team_members')
-          .select('id')
-          .eq('team_id', zone.team_id)
+          .select('team_id')
           .eq('user_id', userId)
-          .single();
+          .in('team_id', zoneTeamIds);
 
-        if (!membership) {
+        if (!memberships || memberships.length === 0) {
           return {
             success: false,
             error: 'You do not have access to book desks in this zone.',

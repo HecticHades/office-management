@@ -3,11 +3,11 @@
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Map, Monitor, Users } from 'lucide-react';
+import { Monitor, Users } from 'lucide-react';
 import type { Zone, Team } from '@/lib/db/types';
 
 type ZoneCardProps = {
-  zone: Zone & { team?: Pick<Team, 'id' | 'name' | 'color'>; deskCount: number };
+  zone: Zone & { teams: Pick<Team, 'id' | 'name' | 'color'>[]; deskCount: number };
 };
 
 export function ZoneCard({ zone }: ZoneCardProps) {
@@ -40,20 +40,27 @@ export function ZoneCard({ zone }: ZoneCardProps) {
               <span>Cap: {zone.capacity}</span>
             </div>
           </div>
-          {zone.team && (
-            <div className="flex items-center gap-1.5">
-              <Badge
-                variant="secondary"
-                className="text-xs rounded-full"
-                style={{
-                  backgroundColor: `${zone.team.color}15`,
-                  color: zone.team.color,
-                  borderColor: `${zone.team.color}30`,
-                }}
-              >
-                {zone.team.name}
-              </Badge>
+          {zone.teams.length > 0 ? (
+            <div className="flex flex-wrap items-center gap-1.5">
+              {zone.teams.map((team) => (
+                <Badge
+                  key={team.id}
+                  variant="secondary"
+                  className="text-xs rounded-full"
+                  style={{
+                    backgroundColor: `${team.color}15`,
+                    color: team.color,
+                    borderColor: `${team.color}30`,
+                  }}
+                >
+                  {team.name}
+                </Badge>
+              ))}
             </div>
+          ) : (
+            <Badge variant="secondary" className="text-xs rounded-full text-stone-400">
+              Open Zone
+            </Badge>
           )}
         </CardContent>
       </Card>
