@@ -19,6 +19,7 @@ type FloorPlanCanvasProps = {
   children: React.ReactNode;
   isEditMode: boolean;
   onZoomChange?: (scale: number) => void;
+  backgroundImageUrl?: string | null;
 };
 
 function ZoomControls({
@@ -38,7 +39,7 @@ function ZoomControls({
 }
 
 const FloorPlanCanvas = React.forwardRef<FloorPlanCanvasRef, FloorPlanCanvasProps>(
-  function FloorPlanCanvas({ children, isEditMode, onZoomChange }, ref) {
+  function FloorPlanCanvas({ children, isEditMode, onZoomChange, backgroundImageUrl }, ref) {
     const controlsRef = useRef<FloorPlanCanvasRef | null>(null);
     const wrapperRef = useRef<ReactZoomPanPinchRef | null>(null);
 
@@ -76,10 +77,20 @@ const FloorPlanCanvas = React.forwardRef<FloorPlanCanvasRef, FloorPlanCanvasProp
           >
             <div
               className={cn(
-                'bg-blueprint relative',
+                'relative',
                 'h-[800px] w-[1200px]',
+                !backgroundImageUrl && 'bg-blueprint',
               )}
             >
+              {/* Background floor plan image */}
+              {backgroundImageUrl && (
+                <img
+                  src={backgroundImageUrl}
+                  alt="Floor plan background"
+                  className="absolute inset-0 h-full w-full object-cover pointer-events-none"
+                  draggable={false}
+                />
+              )}
               {children}
             </div>
           </TransformComponent>

@@ -9,12 +9,15 @@ import {
   Maximize2,
   Pencil,
   Filter,
+  ImageIcon,
+  PenTool,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TIME_SLOT_LABELS, type TimeSlot } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
+import { FloorPlanImageUpload } from './FloorPlanImageUpload';
 import {
   Popover,
   PopoverTrigger,
@@ -46,6 +49,14 @@ type FloorPlanToolbarProps = {
   zones: { id: string; name: string; color: string }[];
   selectedZoneId: string | null;
   onZoneFilter: (zoneId: string | null) => void;
+  // Floor plan image
+  imageUrl: string | null;
+  onImageSaved: (url: string | null) => void;
+  // Zone drawing
+  isDrawingZone: boolean;
+  onDrawZoneToggle: () => void;
+  drawingZoneId: string | null;
+  onDrawingZoneChange: (zoneId: string | null) => void;
 };
 
 const SLOT_OPTIONS: { value: SlotOption; label: string }[] = [
@@ -70,6 +81,12 @@ function FloorPlanToolbar({
   zones,
   selectedZoneId,
   onZoneFilter,
+  imageUrl,
+  onImageSaved,
+  isDrawingZone,
+  onDrawZoneToggle,
+  drawingZoneId,
+  onDrawingZoneChange,
 }: FloorPlanToolbarProps) {
   const dateValue = parseISO(selectedDate);
 
@@ -191,6 +208,67 @@ function FloorPlanToolbar({
               </Badge>
             )}
           </div>
+
+          {/* Admin tools — only shown in edit mode */}
+          {isEditMode && (
+            <>
+              <Separator orientation="vertical" className="hidden h-6 sm:block" />
+
+              {/* Floor plan image upload */}
+              <FloorPlanImageUpload
+                currentImageUrl={imageUrl}
+                onSave={onImageSaved}
+                trigger={
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <ImageIcon className="size-4 text-stone-500" />
+                    <span className="hidden sm:inline">Background</span>
+                  </Button>
+                }
+              />
+
+              {/* Zone drawing toggle */}
+              <div className="flex items-center gap-1.5">
+                <Button
+                  variant={isDrawingZone ? 'default' : 'outline'}
+                  size="sm"
+                  className={cn(
+                    'gap-2',
+                    isDrawingZone && 'bg-teal-600 text-white hover:bg-teal-700',
+                  )}
+                  onClick={onDrawZoneToggle}
+                >
+                  <PenTool className="size-4" />
+                  <span className="hidden sm:inline">Draw Zone</span>
+                </Button>
+
+                {isDrawingZone && (
+                  <Select
+                    value={drawingZoneId ?? ''}
+                    onValueChange={(value) =>
+                      onDrawingZoneChange(value || null)
+                    }
+                  >
+                    <SelectTrigger size="sm" className="h-8 min-w-[140px]">
+                      <SelectValue placeholder="Select zone…" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {zones.map((zone) => (
+                        <SelectItem key={zone.id} value={zone.id}>
+                          <span className="flex items-center gap-2">
+                            <span
+                              className="inline-block size-2.5 rounded-full"
+                              style={{ backgroundColor: zone.color }}
+                            />
+                            {zone.name}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+            </>
+          )}
         </>
       )}
     </div>

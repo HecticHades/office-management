@@ -11,7 +11,9 @@ import { FloorPlanLegend } from './FloorPlanLegend';
 import { DeskNode, type DeskDisplayStatus } from './DeskNode';
 import { ZoneOverlay } from './ZoneOverlay';
 import { DeskDetailPanel } from './DeskDetailPanel';
+import { ZoneDrawingLayer } from './ZoneDrawingLayer';
 import { getFloorPlanData, updateDeskPosition } from '@/actions/floor-plan';
+import { getFloorPlanConfig, updateZoneBoundary } from '@/actions/floor-plan-config';
 import { useRealtimeBookings } from '@/lib/hooks/use-realtime-bookings';
 import type { Desk, TimeSlot } from '@/lib/db/types';
 
@@ -70,6 +72,14 @@ export function FloorPlanView() {
   const [currentUserId, setCurrentUserId] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
 
+  // Floor plan image & scale
+  const [floorPlanImageUrl, setFloorPlanImageUrl] = useState<string | null>(null);
+  const [currentScale, setCurrentScale] = useState(0.8);
+
+  // Zone drawing mode
+  const [isDrawingZone, setIsDrawingZone] = useState(false);
+  const [drawingZoneId, setDrawingZoneId] = useState<string | null>(null);
+
   const canvasRef = useRef<FloorPlanCanvasRef>(null);
 
   // --- Data loading ---
@@ -84,6 +94,15 @@ export function FloorPlanView() {
     setCurrentUserId(result.currentUserId);
     setIsAdmin(result.isAdmin);
     setIsLoading(false);
+  }, []);
+
+  // Load floor plan config once on mount
+  useEffect(() => {
+    getFloorPlanConfig().then((cfg) => {
+      if (!cfg.error) {
+        setFloorPlanImageUrl(cfg.image_url);
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -172,6 +191,59 @@ export function FloorPlanView() {
     [selectedDate, fetchData]
   );
 
+  const handleRotationEnd = useCallback(
+    async (deskId: string, rotation: number) => {
+      const desk = desks.find((d) => d.id === deskId);
+      if (!desk) return;
+      const result = await updateDeskPosition(deskId, desk.pos_x, desk.pos_y, rotation);
+      if (result.success) {
+        toast.success('Desk rotation updated');
+        fetchData(selectedDate);
+      } else {
+        toast.error(result.error || 'Failed to update rotation');
+        fetchData(selectedDate);
+      }
+    },
+    [desks, selectedDate, fetchData]
+  );
+
+  const handleZoomChange = useCallback((scale: number) => {
+    setCurrentScale(scale);
+  }, []);
+
+  const handleImageSaved = useCallback((url: string | null) => {
+    setFloorPlanImageUrl(url);
+  }, []);
+
+  const handleDrawZoneToggle = useCallback(() => {
+    setIsDrawingZone((prev) => {
+      if (prev) {
+        setDrawingZoneId(null);
+      }
+      return !prev;
+    });
+  }, []);
+
+  const handleDrawComplete = useCallback(
+    async (zoneId: string, boundaryPath: string) => {
+      const result = await updateZoneBoundary(zoneId, boundaryPath);
+      if (result.success) {
+        toast.success('Zone boundary updated');
+        fetchData(selectedDate);
+      } else {
+        toast.error(result.error || 'Failed to update zone boundary');
+      }
+      setIsDrawingZone(false);
+      setDrawingZoneId(null);
+    },
+    [selectedDate, fetchData]
+  );
+
+  const handleDrawCancel = useCallback(() => {
+    setIsDrawingZone(false);
+    setDrawingZoneId(null);
+  }, []);
+
   const handleZoomIn = useCallback(() => canvasRef.current?.zoomIn(), []);
   const handleZoomOut = useCallback(() => canvasRef.current?.zoomOut(), []);
   const handleResetZoom = useCallback(() => canvasRef.current?.resetTransform(), []);
@@ -199,6 +271,14 @@ export function FloorPlanView() {
     );
   }, [selectedDeskId, bookings]);
 
+  // --- Drawing target zone ---
+  const drawingTargetZone = useMemo(() => {
+    if (!isDrawingZone || !drawingZoneId) return null;
+    const zone = zones.find((z) => z.id === drawingZoneId);
+    if (!zone) return null;
+    return { id: zone.id, name: zone.name, color: zone.color };
+  }, [isDrawingZone, drawingZoneId, zones]);
+
   // --- Render ---
   if (isLoading) {
     return (
@@ -225,9 +305,20 @@ export function FloorPlanView() {
           zones={zones}
           selectedZoneId={selectedZoneId}
           onZoneFilter={setSelectedZoneId}
+          imageUrl={floorPlanImageUrl}
+          onImageSaved={handleImageSaved}
+          isDrawingZone={isDrawingZone}
+          onDrawZoneToggle={handleDrawZoneToggle}
+          drawingZoneId={drawingZoneId}
+          onDrawingZoneChange={setDrawingZoneId}
         />
 
-        <FloorPlanCanvas ref={canvasRef} isEditMode={isEditMode}>
+        <FloorPlanCanvas
+          ref={canvasRef}
+          isEditMode={isEditMode}
+          onZoomChange={handleZoomChange}
+          backgroundImageUrl={floorPlanImageUrl}
+        >
           {desks.length === 0 ? (
             <div className="absolute inset-0 flex items-center justify-center">
               <p className="max-w-sm text-center text-sm text-stone-400">
@@ -262,11 +353,22 @@ export function FloorPlanView() {
                     bookedBy={info?.bookedBy}
                     isEditMode={isEditMode}
                     isSelected={desk.id === selectedDeskId}
+                    scale={currentScale}
                     onClick={() => handleDeskClick(desk.id)}
                     onDragEnd={(pos) => handleDragEnd(desk.id, pos)}
+                    onRotationEnd={(rotation) => handleRotationEnd(desk.id, rotation)}
                   />
                 );
               })}
+
+              {/* Zone drawing overlay */}
+              <ZoneDrawingLayer
+                isActive={isDrawingZone && !!drawingTargetZone}
+                scale={currentScale}
+                targetZone={drawingTargetZone}
+                onDrawComplete={handleDrawComplete}
+                onCancel={handleDrawCancel}
+              />
             </>
           )}
         </FloorPlanCanvas>
