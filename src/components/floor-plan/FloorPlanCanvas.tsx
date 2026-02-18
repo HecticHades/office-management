@@ -82,11 +82,11 @@ const FloorPlanCanvas = React.forwardRef<FloorPlanCanvasRef, FloorPlanCanvasProp
                 !backgroundImageUrl && 'bg-blueprint',
               )}
             >
-              {/* Background floor plan image */}
+              {/* Workspace image */}
               {backgroundImageUrl && (
                 <img
                   src={backgroundImageUrl}
-                  alt="Floor plan background"
+                  alt="Workspace layout"
                   className="absolute inset-0 h-full w-full object-cover pointer-events-none"
                   draggable={false}
                 />

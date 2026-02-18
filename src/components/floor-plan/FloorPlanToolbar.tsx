@@ -221,7 +221,7 @@ function FloorPlanToolbar({
                 trigger={
                   <Button variant="outline" size="sm" className="gap-2">
                     <ImageIcon className="size-4 text-stone-500" />
-                    <span className="hidden sm:inline">Background</span>
+                    <span className="hidden sm:inline">Workspace</span>
                   </Button>
                 }
               />
