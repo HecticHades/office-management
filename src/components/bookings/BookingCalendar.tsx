@@ -183,15 +183,15 @@ export function BookingCalendar({ initialZones }: BookingCalendarProps) {
           <span>Available</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="h-3 w-3 rounded bg-teal-500" />
+          <div className="h-3 w-3 rounded bg-blue-600" />
           <span>My Booking</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="h-3 w-3 rounded bg-stone-400" />
+          <div className="h-3 w-3 rounded bg-stone-500" />
           <span>Occupied</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="h-3 w-3 rounded bg-amber-500" />
+          <div className="h-3 w-3 rounded bg-rose-500" />
           <span>Maintenance</span>
         </div>
       </div>
@@ -258,7 +258,7 @@ export function BookingCalendar({ initialZones }: BookingCalendarProps) {
                       >
                         {isMaintenance ? (
                           <div className="flex justify-center">
-                            <Badge variant="outline" className="rounded-full bg-amber-50 text-amber-700 border-amber-200 text-[10px]">
+                            <Badge variant="outline" className="rounded-full bg-rose-50 text-rose-700 border-rose-200 text-[10px]">
                               Maintenance
                             </Badge>
                           </div>
@@ -275,8 +275,8 @@ export function BookingCalendar({ initialZones }: BookingCalendarProps) {
                                   className={cn(
                                     'rounded px-1.5 py-0.5 text-[10px] font-medium text-white',
                                     status === 'available' && 'bg-emerald-500',
-                                    status === 'mine' && 'bg-teal-500',
-                                    status === 'booked' && 'bg-stone-400'
+                                    status === 'mine' && 'bg-blue-600',
+                                    status === 'booked' && 'bg-stone-500'
                                   )}
                                   title={`${TIME_SLOT_LABELS[slot]}: ${status}`}
                                 >
