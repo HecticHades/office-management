@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { db } from '@/lib/db/client';
 import { StatsCards } from '@/components/dashboard/StatsCards';
 import { OccupancyChart } from '@/components/dashboard/OccupancyChart';
-import { RecentBookings } from '@/components/dashboard/RecentBookings';
+import { OccupancyTable } from '@/components/dashboard/OccupancyTable';
 import { TeamDistribution } from '@/components/dashboard/TeamDistribution';
 
 async function getDashboardStats() {
@@ -54,29 +54,6 @@ async function getOccupancyData() {
   return days;
 }
 
-async function getRecentBookingsData() {
-  const { data: bookings } = await db
-    .from('bookings')
-    .select('id, date, time_slot, desks:desk_id(id, label, zones:zone_id(name)), users:user_id(id, display_name)')
-    .eq('status', 'confirmed')
-    .order('created_at', { ascending: false })
-    .limit(10);
-
-  return (bookings || []).map((b: Record<string, unknown>) => {
-    const desk = b.desks as Record<string, unknown> | null;
-    const user = b.users as Record<string, unknown> | null;
-    const zone = desk?.zones as Record<string, unknown> | null;
-    return {
-      id: b.id as string,
-      userName: (user?.display_name as string) || 'Unknown',
-      deskLabel: (desk?.label as string) || 'Unknown',
-      zoneName: (zone?.name as string) || 'Unknown',
-      date: b.date as string,
-      timeSlot: b.time_slot as string,
-    };
-  });
-}
-
 async function getTeamDistributionData() {
   const { data: teams } = await db
     .from('teams')
@@ -113,10 +90,9 @@ export default async function DashboardPage() {
   const session = await getSession();
   if (!session) redirect('/login');
 
-  const [stats, occupancyData, recentBookings, teamDistribution] = await Promise.all([
+  const [stats, occupancyData, teamDistribution] = await Promise.all([
     getDashboardStats(),
     getOccupancyData(),
-    getRecentBookingsData(),
     getTeamDistributionData(),
   ]);
 
@@ -136,7 +112,7 @@ export default async function DashboardPage() {
         <TeamDistribution teams={teamDistribution} />
       </div>
 
-      <RecentBookings bookings={recentBookings} />
+      <OccupancyTable />
     </div>
   );
 }
